@@ -7,375 +7,492 @@
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
+
   body {
-    background: #f7f5f2; min-height: 100vh;
-    display: flex; align-items: flex-start; justify-content: center;
+    background: #f7f5f2;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
     padding: 3rem 2rem 5rem;
     font-family: 'Source Serif 4', Georgia, serif;
   }
+
   .page { width: 100%; max-width: 960px; }
+
   .doc-title { text-align: center; margin-bottom: 2.5rem; }
   .doc-title h1 {
-    font-family: 'JetBrains Mono', monospace; font-size: 2.8rem;
-    font-weight: 600; letter-spacing: 0.12em; color: #2c2825; margin-bottom: 0.4rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 2.8rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    color: #2c2825;
+    margin-bottom: 0.4rem;
   }
   .doc-title p { font-size: 1rem; color: #7a756f; font-style: italic; }
+
   .hint { text-align: center; font-size: 0.85rem; color: #9a9590; margin-bottom: 1.5rem; font-style: italic; }
+
   .resilience-frame {
-    border: 2px dashed #7F77DD; border-radius: 20px;
-    padding: 2rem 1.5rem 1.5rem; position: relative;
+    border: 2px dashed #7F77DD;
+    border-radius: 20px;
+    padding: 2rem 1.5rem 1.5rem;
+    position: relative;
   }
+
   .resilience-label {
     position: absolute; top: -14px; left: 24px;
-    background: #EEEDFE; border: 1px solid #AFA9EC; border-radius: 8px;
-    padding: 0.2rem 0.75rem; font-family: 'JetBrains Mono', monospace;
+    background: #EEEDFE; border: 1px solid #AFA9EC;
+    border-radius: 8px; padding: 0.2rem 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
     font-size: 0.75rem; font-weight: 600; color: #3C3489; letter-spacing: 0.04em;
   }
   .resilience-label-bottom {
     position: absolute; bottom: -14px; right: 24px;
-    background: #EEEDFE; border: 1px solid #AFA9EC; border-radius: 8px;
-    padding: 0.2rem 0.75rem; font-family: 'JetBrains Mono', monospace;
+    background: #EEEDFE; border: 1px solid #AFA9EC;
+    border-radius: 8px; padding: 0.2rem 0.75rem;
+    font-family: 'JetBrains Mono', monospace;
     font-size: 0.75rem; font-weight: 600; color: #3C3489; letter-spacing: 0.04em;
   }
+
   .layers { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
+
   .layer {
-    border-radius: 14px; padding: 1.4rem 1.5rem 1.2rem; cursor: pointer;
+    border-radius: 14px;
+    padding: 1.4rem 1.5rem 1.2rem;
+    cursor: pointer;
     transition: opacity 0.15s, box-shadow 0.15s;
-    display: flex; gap: 1.25rem; align-items: flex-start; border: 2px solid transparent;
+    display: flex;
+    gap: 1.25rem;
+    align-items: flex-start;
+    border: 2px solid transparent;
   }
-  .layer:hover { opacity: 0.92; box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
-  .layer.open { border-color: rgba(0,0,0,0.1); }
+  .layer:hover { opacity: 0.9; box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
+  .layer.open { border-color: rgba(0,0,0,0.12); }
+
   .layer-letter {
-    font-family: 'JetBrains Mono', monospace; font-size: 3.2rem;
-    font-weight: 600; line-height: 1; flex-shrink: 0; width: 52px; text-align: center; margin-top: 2px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 3.2rem; font-weight: 600; line-height: 1;
+    flex-shrink: 0; width: 52px; text-align: center; margin-top: 2px;
   }
+
   .layer-divider { width: 1px; align-self: stretch; opacity: 0.3; flex-shrink: 0; }
+
   .layer-content { flex: 1; min-width: 0; }
   .layer-name { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.25rem; }
   .layer-desc { font-size: 0.9rem; margin-bottom: 0.75rem; opacity: 0.8; font-style: italic; line-height: 1.5; }
+
   .tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
   .tag {
-    font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;
-    padding: 0.2rem 0.55rem; border-radius: 5px; border: 1px solid; line-height: 1.6;
-    cursor: pointer; transition: opacity 0.12s, transform 0.12s; user-select: none;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem; padding: 0.2rem 0.55rem;
+    border-radius: 5px; border: 1px solid; line-height: 1.6; opacity: 0.85;
   }
-  .tag:hover { opacity: 0.72; transform: translateY(-1px); }
+
+  /* Expandable detail panel */
   .detail {
-    display: none; margin-top: 1.1rem; padding-top: 1.1rem; border-top: 1px solid rgba(0,0,0,0.1);
+    display: none;
+    margin-top: 1.1rem;
+    padding-top: 1.1rem;
+    border-top: 1px solid rgba(0,0,0,0.1);
   }
   .layer.open .detail { display: block; }
-  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 0.85rem; }
+
+  .detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .detail-cell { }
   .detail-cell .dc-label {
-    font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 600;
-    letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.55; margin-bottom: 0.3rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 0.55;
+    margin-bottom: 0.3rem;
   }
   .detail-cell p { font-size: 0.88rem; line-height: 1.65; opacity: 0.85; }
+
   .invariant-row {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
-    margin-top: 0.85rem; padding-top: 0.85rem; border-top: 1px solid rgba(0,0,0,0.07);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 0.85rem;
+    padding-top: 0.85rem;
+    border-top: 1px solid rgba(0,0,0,0.07);
   }
+  .inv-block { }
   .inv-block .inv-label {
-    font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 600;
-    letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.55; margin-bottom: 0.3rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem; font-weight: 600;
+    letter-spacing: 0.06em; text-transform: uppercase;
+    opacity: 0.55; margin-bottom: 0.3rem;
   }
   .inv-block p { font-size: 0.85rem; font-style: italic; line-height: 1.6; opacity: 0.8; }
+
   .open-indicator {
-    font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; opacity: 0.4;
-    float: right; margin-top: 4px; transition: transform 0.2s; display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    opacity: 0.4;
+    float: right;
+    margin-top: 4px;
+    transition: transform 0.2s;
   }
   .layer.open .open-indicator { transform: rotate(180deg); }
-  /* Overlay */
-  .overlay {
-    display: none; position: fixed; inset: 0;
-    background: rgba(0,0,0,0.38); z-index: 100;
-    align-items: center; justify-content: center; padding: 2rem;
-  }
-  .overlay.active { display: flex; }
-  .popover {
-    background: #ffffff; border-radius: 16px; max-width: 580px; width: 100%;
-    max-height: 82vh; overflow-y: auto; padding: 2rem;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.2); position: relative;
-  }
-  .popover-close {
-    position: absolute; top: 1rem; right: 1rem;
-    background: #f1efe8; border: none; border-radius: 50%;
-    width: 28px; height: 28px; cursor: pointer; font-size: 1rem; color: #5f5e5a;
-    display: flex; align-items: center; justify-content: center; transition: background 0.15s;
-  }
-  .popover-close:hover { background: #e4e0d9; }
-  .popover-category { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #888780; margin-bottom: 0.4rem; }
-  .popover h2 { font-size: 1.3rem; font-weight: 600; color: #2c2825; margin-bottom: 1.1rem; line-height: 1.3; }
-  .pop-section { margin-bottom: 1.1rem; }
-  .pop-label { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: #888780; margin-bottom: 0.35rem; }
-  .pop-section p { font-size: 0.93rem; line-height: 1.72; color: #3d3a36; }
-  .pop-section ul { padding-left: 1.2rem; }
-  .pop-section ul li { font-size: 0.91rem; line-height: 1.65; color: #3d3a36; margin-bottom: 0.3rem; }
-  .oss-pills { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
-  .oss-pill {
-    font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;
-    background: #f1efe8; border: 1px solid #d3d1c7;
-    border-radius: 5px; padding: 0.2rem 0.6rem; color: #444441;
-  }
-  /* Layer colours */
-  .l-teal { background: #E1F5EE; }
+
+  /* Layer colour themes */
+  .l-teal   { background: #E1F5EE; }
   .l-teal .layer-letter, .l-teal .layer-name { color: #085041; }
   .l-teal .layer-desc { color: #0F6E56; }
   .l-teal .layer-divider { background: #1D9E75; }
   .l-teal .tag { background: #b8ead7; border-color: #5DCAA5; color: #085041; }
-  .l-blue { background: #E6F1FB; }
+  .l-teal .detail { border-top-color: #9FE1CB; }
+  .l-teal .invariant-row { border-top-color: #9FE1CB; }
+
+  .l-blue   { background: #E6F1FB; }
   .l-blue .layer-letter, .l-blue .layer-name { color: #0C447C; }
   .l-blue .layer-desc { color: #185FA5; }
   .l-blue .layer-divider { background: #378ADD; }
   .l-blue .tag { background: #c4ddf5; border-color: #85B7EB; color: #0C447C; }
-  .l-amber { background: #FAEEDA; }
+  .l-blue .detail { border-top-color: #B5D4F4; }
+  .l-blue .invariant-row { border-top-color: #B5D4F4; }
+
+  .l-amber  { background: #FAEEDA; }
   .l-amber .layer-letter, .l-amber .layer-name { color: #633806; }
   .l-amber .layer-desc { color: #854F0B; }
   .l-amber .layer-divider { background: #BA7517; }
   .l-amber .tag { background: #f7d89a; border-color: #EF9F27; color: #633806; }
-  .l-green { background: #EAF3DE; }
+  .l-amber .detail { border-top-color: #FAC775; }
+  .l-amber .invariant-row { border-top-color: #FAC775; }
+
+  .l-green  { background: #EAF3DE; }
   .l-green .layer-letter, .l-green .layer-name { color: #27500A; }
   .l-green .layer-desc { color: #3B6D11; }
   .l-green .layer-divider { background: #639922; }
   .l-green .tag { background: #cce4a0; border-color: #97C459; color: #27500A; }
-  .l-coral { background: #FAECE7; }
+  .l-green .detail { border-top-color: #C0DD97; }
+  .l-green .invariant-row { border-top-color: #C0DD97; }
+
+  .l-coral  { background: #FAECE7; }
   .l-coral .layer-letter, .l-coral .layer-name { color: #712B13; }
   .l-coral .layer-desc { color: #993C1D; }
   .l-coral .layer-divider { background: #D85A30; }
   .l-coral .tag { background: #f5c4b0; border-color: #F0997B; color: #712B13; }
-  .l-gray { background: #F1EFE8; }
+  .l-coral .detail { border-top-color: #F5C4B3; }
+  .l-coral .invariant-row { border-top-color: #F5C4B3; }
+
+  .l-gray   { background: #F1EFE8; }
   .l-gray .layer-letter, .l-gray .layer-name { color: #2C2C2A; }
   .l-gray .layer-desc { color: #5F5E5A; }
   .l-gray .layer-divider { background: #888780; }
   .l-gray .tag { background: #dddbd3; border-color: #B4B2A9; color: #2C2C2A; }
+  .l-gray .detail { border-top-color: #D3D1C7; }
+  .l-gray .invariant-row { border-top-color: #D3D1C7; }
+
+  /* Resilience band */
   .resilience-band {
     background: #EEEDFE; border: 1px solid #AFA9EC;
     border-radius: 14px; padding: 1.25rem 1.5rem 1.4rem; margin-top: 10px;
+    cursor: pointer; transition: opacity 0.15s;
   }
-  .r-header { cursor: pointer; }
+  .resilience-band:hover { opacity: 0.9; }
+  .resilience-band.open .r-detail { display: block; }
+
   .r-label { font-size: 0.8rem; font-style: italic; color: #534AB7; margin-bottom: 0.75rem; text-align: center; }
   .resilience-band .tags { justify-content: center; margin-bottom: 0.6rem; }
   .resilience-band .tag { background: #d8d6f8; border-color: #AFA9EC; color: #3C3489; }
+
   .r-detail { display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #AFA9EC; }
-  .resilience-band.open .r-detail { display: block; }
+
   .invariants { display: flex; flex-direction: column; gap: 0.35rem; margin-top: 0.85rem; }
-  .invariant { font-size: 0.82rem; color: #534AB7; font-style: italic; text-align: center; line-height: 1.5; }
+  .invariant {
+    font-size: 0.82rem; color: #534AB7; font-style: italic;
+    text-align: center; line-height: 1.5;
+  }
   .invariant strong { font-style: normal; font-weight: 600; }
+
   @media (max-width: 640px) {
     .layer-letter { font-size: 2.2rem; width: 40px; }
     .doc-title h1 { font-size: 2rem; }
     .detail-grid, .invariant-row { grid-template-columns: 1fr; }
-    .popover { padding: 1.5rem; }
   }
 </style>
 </head>
 <body>
-
-<div class="overlay" id="overlay" onclick="closePopover(event)">
-  <div class="popover" id="popover">
-    <button class="popover-close" onclick="closeOverlay()">&#x2715;</button>
-    <div class="popover-category" id="pop-cat"></div>
-    <h2 id="pop-title"></h2>
-    <div class="pop-section"><div class="pop-label">What it does</div><p id="pop-what"></p></div>
-    <div class="pop-section"><div class="pop-label">Key tradeoffs</div><ul id="pop-tradeoffs"></ul></div>
-    <div class="pop-section"><div class="pop-label">Open source examples</div><div class="oss-pills" id="pop-oss"></div></div>
-  </div>
-</div>
-
 <div class="page">
+
   <div class="doc-title">
     <h1>RECODED</h1>
     <p>A DevEx platform engineering reference model</p>
   </div>
-  <p class="hint">Click a layer to expand it &mdash; click any solution tag for a full explanation</p>
+
+  <p class="hint">Click any layer to expand its detail</p>
 
   <div class="resilience-frame">
-    <span class="resilience-label">R &mdash; Resilience patterns (cross-cutting)</span>
+    <span class="resilience-label">R - Resilience patterns (cross-cutting)</span>
     <span class="resilience-label-bottom">Applied across every layer</span>
+
     <div class="layers">
 
       <!-- E: Edge -->
-      <div class="layer l-teal" onclick="toggleLayer(event,this)">
+      <div class="layer l-teal" onclick="toggle(this)">
         <div class="layer-letter">E</div>
         <div class="layer-divider"></div>
         <div class="layer-content">
           <div class="layer-name">Edge &amp; traffic control <span class="open-indicator">&#9660;</span></div>
           <div class="layer-desc">The front door - only valid, within-policy traffic gets through</div>
           <div class="tags">
-            <span class="tag" onclick="showTag(event,'API gateway','Edge &amp; traffic control')">API gateway</span>
-            <span class="tag" onclick="showTag(event,'Web application firewall','Edge &amp; traffic control')">Web application firewall</span>
-            <span class="tag" onclick="showTag(event,'DDoS protection','Edge &amp; traffic control')">DDoS protection</span>
-            <span class="tag" onclick="showTag(event,'TLS termination proxy','Edge &amp; traffic control')">TLS termination proxy</span>
-            <span class="tag" onclick="showTag(event,'CDN','Edge &amp; traffic control')">CDN</span>
-            <span class="tag" onclick="showTag(event,'Rate limiter','Edge &amp; traffic control')">Rate limiter</span>
-            <span class="tag" onclick="showTag(event,'DNS load balancer','Edge &amp; traffic control')">DNS load balancer</span>
-            <span class="tag" onclick="showTag(event,'Ingress controller','Edge &amp; traffic control')">Ingress controller</span>
-            <span class="tag" onclick="showTag(event,'Bot detection','Edge &amp; traffic control')">Bot detection</span>
+            <span class="tag">API gateway</span>
+            <span class="tag">Web application firewall</span>
+            <span class="tag">DDoS protection</span>
+            <span class="tag">TLS termination proxy</span>
+            <span class="tag">CDN</span>
+            <span class="tag">Rate limiter</span>
+            <span class="tag">DNS load balancer</span>
+            <span class="tag">Ingress controller</span>
+            <span class="tag">Bot detection</span>
           </div>
           <div class="detail">
             <div class="detail-grid">
-              <div class="detail-cell"><div class="dc-label">Platform view</div><p>Control and protection point for all external traffic. Enforces safe ingress before compute resources are consumed. Only validated, within-policy traffic reaches internal services.</p></div>
-              <div class="detail-cell"><div class="dc-label">Developer view</div><p>The first surface a developer's service is exposed through. Developers should discover and reason about traffic policy without platform team intervention.</p></div>
+              <div class="detail-cell">
+                <div class="dc-label">Platform view</div>
+                <p>Control and protection point for all external traffic. Enforces safe ingress before compute resources are consumed. Only validated, within-policy traffic reaches internal services - failure defaults to blocking.</p>
+              </div>
+              <div class="detail-cell">
+                <div class="dc-label">Developer view</div>
+                <p>The first surface a developer's service is exposed through. Determines what their API looks like to the outside world. Developers should be able to discover, test, and reason about traffic policy without platform team intervention.</p>
+              </div>
             </div>
             <div class="invariant-row">
-              <div class="inv-block"><div class="inv-label">Platform invariant</div><p>Only validated and within-policy traffic reaches internal services; failure defaults to blocking untrusted traffic.</p></div>
-              <div class="inv-block"><div class="inv-label">Developer invariant</div><p>Developers can discover, test, and reason about their service's traffic policy without platform team intervention.</p></div>
+              <div class="inv-block">
+                <div class="inv-label">Platform invariant</div>
+                <p>Only validated and within-policy traffic reaches internal services; failure defaults to blocking untrusted traffic.</p>
+              </div>
+              <div class="inv-block">
+                <div class="inv-label">Developer invariant</div>
+                <p>Developers can discover, test, and reason about their service's traffic policy without platform team intervention.</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       <!-- C: Compute -->
-      <div class="layer l-blue" onclick="toggleLayer(event,this)">
+      <div class="layer l-blue" onclick="toggle(this)">
         <div class="layer-letter">C</div>
         <div class="layer-divider"></div>
         <div class="layer-content">
           <div class="layer-name">Compute &amp; service architecture <span class="open-indicator">&#9660;</span></div>
           <div class="layer-desc">Where code runs - replaceable services, controlled communication</div>
           <div class="tags">
-            <span class="tag" onclick="showTag(event,'Container runtime','Compute &amp; service architecture')">Container runtime</span>
-            <span class="tag" onclick="showTag(event,'Container orchestrator','Compute &amp; service architecture')">Container orchestrator</span>
-            <span class="tag" onclick="showTag(event,'Service mesh','Compute &amp; service architecture')">Service mesh</span>
-            <span class="tag" onclick="showTag(event,'Internal load balancer','Compute &amp; service architecture')">Internal load balancer</span>
-            <span class="tag" onclick="showTag(event,'Sidecar proxy','Compute &amp; service architecture')">Sidecar proxy</span>
-            <span class="tag" onclick="showTag(event,'Service discovery registry','Compute &amp; service architecture')">Service discovery registry</span>
-            <span class="tag" onclick="showTag(event,'Deployment pipeline','Compute &amp; service architecture')">Deployment pipeline</span>
-            <span class="tag" onclick="showTag(event,'Internal developer portal','Compute &amp; service architecture')">Internal developer portal</span>
-            <span class="tag" onclick="showTag(event,'Local dev environment tool','Compute &amp; service architecture')">Local dev environment tool</span>
-            <span class="tag" onclick="showTag(event,'Service template / scaffold','Compute &amp; service architecture')">Service template / scaffold</span>
+            <span class="tag">Container runtime</span>
+            <span class="tag">Container orchestrator</span>
+            <span class="tag">Service mesh</span>
+            <span class="tag">Internal load balancer</span>
+            <span class="tag">Sidecar proxy</span>
+            <span class="tag">Service discovery registry</span>
+            <span class="tag">Deployment pipeline</span>
+            <span class="tag">Internal developer portal</span>
+            <span class="tag">Local dev environment tool</span>
+            <span class="tag">Service template / scaffold</span>
           </div>
           <div class="detail">
             <div class="detail-grid">
-              <div class="detail-cell"><div class="dc-label">Platform view</div><p>Execution environment for services. Services run stateless or state-minimised with controlled communication paths. Services are replaceable and do not rely on local state.</p></div>
-              <div class="detail-cell"><div class="dc-label">Developer view</div><p>The runtime contract a developer writes code against. A predictable, low-friction deployment target. Local-to-production parity is essential - the same mental model at every stage.</p></div>
+              <div class="detail-cell">
+                <div class="dc-label">Platform view</div>
+                <p>Execution environment for services and their interactions. Services run stateless or state-minimised with controlled communication paths. Services are replaceable and do not rely on local state or topology assumptions.</p>
+              </div>
+              <div class="detail-cell">
+                <div class="dc-label">Developer view</div>
+                <p>The runtime contract a developer writes code against. A predictable, low-friction deployment target that doesn't require deep platform knowledge. Local-to-production parity is essential - the same mental model at every stage.</p>
+              </div>
             </div>
             <div class="invariant-row">
-              <div class="inv-block"><div class="inv-label">Platform invariant</div><p>Services are replaceable and do not rely on local state or topology assumptions.</p></div>
-              <div class="inv-block"><div class="inv-label">Developer invariant</div><p>A developer can deploy, run locally, and debug their service using the same mental model and tooling at every stage.</p></div>
+              <div class="inv-block">
+                <div class="inv-label">Platform invariant</div>
+                <p>Services are replaceable and do not rely on local state or topology assumptions.</p>
+              </div>
+              <div class="inv-block">
+                <div class="inv-label">Developer invariant</div>
+                <p>A developer can deploy, run locally, and debug their service using the same mental model and tooling at every stage.</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       <!-- O: Observability -->
-      <div class="layer l-amber" onclick="toggleLayer(event,this)">
+      <div class="layer l-amber" onclick="toggle(this)">
         <div class="layer-letter">O</div>
         <div class="layer-divider"></div>
         <div class="layer-content">
           <div class="layer-name">Observability &amp; diagnostics <span class="open-indicator">&#9660;</span></div>
           <div class="layer-desc">If you can't see it, you can't fix it - every request leaves a trace</div>
           <div class="tags">
-            <span class="tag" onclick="showTag(event,'Structured log aggregator','Observability &amp; diagnostics')">Structured log aggregator</span>
-            <span class="tag" onclick="showTag(event,'Metrics collection agent','Observability &amp; diagnostics')">Metrics collection agent</span>
-            <span class="tag" onclick="showTag(event,'Time-series database','Observability &amp; diagnostics')">Time-series database</span>
-            <span class="tag" onclick="showTag(event,'Distributed tracing system','Observability &amp; diagnostics')">Distributed tracing system</span>
-            <span class="tag" onclick="showTag(event,'Alerting engine','Observability &amp; diagnostics')">Alerting engine</span>
-            <span class="tag" onclick="showTag(event,'Dashboarding platform','Observability &amp; diagnostics')">Dashboarding platform</span>
-            <span class="tag" onclick="showTag(event,'On-call routing tool','Observability &amp; diagnostics')">On-call routing tool</span>
-            <span class="tag" onclick="showTag(event,'Error tracking service','Observability &amp; diagnostics')">Error tracking service</span>
-            <span class="tag" onclick="showTag(event,'Telemetry SDK','Observability &amp; diagnostics')">Telemetry SDK</span>
+            <span class="tag">Structured log aggregator</span>
+            <span class="tag">Metrics collection agent</span>
+            <span class="tag">Time-series database</span>
+            <span class="tag">Distributed tracing system</span>
+            <span class="tag">Alerting engine</span>
+            <span class="tag">Dashboarding platform</span>
+            <span class="tag">On-call routing tool</span>
+            <span class="tag">Error tracking service</span>
+            <span class="tag">Telemetry SDK</span>
           </div>
           <div class="detail">
             <div class="detail-grid">
-              <div class="detail-cell"><div class="dc-label">Platform view</div><p>Actionable visibility into system behaviour and failure modes. Every request carries traceable context across all service boundaries.</p></div>
-              <div class="detail-cell"><div class="dc-label">Developer view</div><p>The primary tool a developer has for understanding whether their service is working and why it failed. Production must be legible without understanding the telemetry pipeline.</p></div>
+              <div class="detail-cell">
+                <div class="dc-label">Platform view</div>
+                <p>Actionable visibility into system behaviour and failure modes in production. Every request carries traceable context across all service boundaries. Traceability, correlation, and telemetry overhead are the key concerns.</p>
+              </div>
+              <div class="detail-cell">
+                <div class="dc-label">Developer view</div>
+                <p>The primary tool a developer has for understanding whether their service is working and why it failed. Time to first insight during an incident matters most. Production must be legible without needing to understand the telemetry pipeline itself.</p>
+              </div>
             </div>
             <div class="invariant-row">
-              <div class="inv-block"><div class="inv-label">Platform invariant</div><p>Every request carries traceable context across all service boundaries.</p></div>
-              <div class="inv-block"><div class="inv-label">Developer invariant</div><p>A developer can diagnose a production failure using platform-provided tooling without needing platform team assistance.</p></div>
+              <div class="inv-block">
+                <div class="inv-label">Platform invariant</div>
+                <p>Every request carries traceable context across all service boundaries.</p>
+              </div>
+              <div class="inv-block">
+                <div class="inv-label">Developer invariant</div>
+                <p>A developer can diagnose a production failure in their service using platform-provided tooling without needing platform team assistance.</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       <!-- D: Data -->
-      <div class="layer l-green" onclick="toggleLayer(event,this)">
+      <div class="layer l-green" onclick="toggle(this)">
         <div class="layer-letter">D</div>
         <div class="layer-divider"></div>
         <div class="layer-content">
           <div class="layer-name">Data &amp; storage <span class="open-indicator">&#9660;</span></div>
           <div class="layer-desc">State with a contract - know your consistency guarantees before you commit</div>
           <div class="tags">
-            <span class="tag" onclick="showTag(event,'Relational database','Data &amp; storage')">Relational database</span>
-            <span class="tag" onclick="showTag(event,'Document store','Data &amp; storage')">Document store</span>
-            <span class="tag" onclick="showTag(event,'Key-value store','Data &amp; storage')">Key-value store</span>
-            <span class="tag" onclick="showTag(event,'Wide-column store','Data &amp; storage')">Wide-column store</span>
-            <span class="tag" onclick="showTag(event,'Distributed cache','Data &amp; storage')">Distributed cache</span>
-            <span class="tag" onclick="showTag(event,'Object / blob storage','Data &amp; storage')">Object / blob storage</span>
-            <span class="tag" onclick="showTag(event,'Search index','Data &amp; storage')">Search index</span>
-            <span class="tag" onclick="showTag(event,'Schema migration tool','Data &amp; storage')">Schema migration tool</span>
-            <span class="tag" onclick="showTag(event,'Connection pooler','Data &amp; storage')">Connection pooler</span>
-            <span class="tag" onclick="showTag(event,'Point-in-time recovery','Data &amp; storage')">Point-in-time recovery</span>
+            <span class="tag">Relational database</span>
+            <span class="tag">Document store</span>
+            <span class="tag">Key-value store</span>
+            <span class="tag">Wide-column store</span>
+            <span class="tag">Distributed cache</span>
+            <span class="tag">Object / blob storage</span>
+            <span class="tag">Search index</span>
+            <span class="tag">Schema migration tool</span>
+            <span class="tag">Connection pooler</span>
+            <span class="tag">Point-in-time recovery</span>
           </div>
           <div class="detail">
             <div class="detail-grid">
-              <div class="detail-cell"><div class="dc-label">Platform view</div><p>Persistent and cached state management within defined consistency and durability bounds. Every dataset has explicit and documented consistency and failure behaviour under partition.</p></div>
-              <div class="detail-cell"><div class="dc-label">Developer view</div><p>The place where application behaviour is shaped by constraints a developer may not have chosen themselves. Developers must know what guarantees they are getting before committing to a storage choice.</p></div>
+              <div class="detail-cell">
+                <div class="dc-label">Platform view</div>
+                <p>Persistent and cached state management within defined consistency and durability bounds. Every dataset has explicit and documented consistency and failure behaviour under partition. Strong vs eventual consistency is the core design decision.</p>
+              </div>
+              <div class="detail-cell">
+                <div class="dc-label">Developer view</div>
+                <p>The place where application behaviour is shaped by constraints a developer may not have chosen themselves. Developers must know exactly what guarantees they are getting and giving up before committing to a storage choice.</p>
+              </div>
             </div>
             <div class="invariant-row">
-              <div class="inv-block"><div class="inv-label">Platform invariant</div><p>Every dataset has explicit and documented consistency and failure behaviour under partition.</p></div>
-              <div class="inv-block"><div class="inv-label">Developer invariant</div><p>Developers know exactly what guarantees they are getting and giving up before committing to a storage choice.</p></div>
+              <div class="inv-block">
+                <div class="inv-label">Platform invariant</div>
+                <p>Every dataset has explicit and documented consistency and failure behaviour under partition.</p>
+              </div>
+              <div class="inv-block">
+                <div class="inv-label">Developer invariant</div>
+                <p>Developers know exactly what guarantees they are getting and what they are giving up before they commit to a storage choice.</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       <!-- E: Eventing -->
-      <div class="layer l-coral" onclick="toggleLayer(event,this)">
+      <div class="layer l-coral" onclick="toggle(this)">
         <div class="layer-letter">E</div>
         <div class="layer-divider"></div>
         <div class="layer-content">
           <div class="layer-name">Eventing &amp; async processing <span class="open-indicator">&#9660;</span></div>
           <div class="layer-desc">Decouple to survive - consumers must handle duplicates and delays gracefully</div>
           <div class="tags">
-            <span class="tag" onclick="showTag(event,'Message queue','Eventing &amp; async processing')">Message queue</span>
-            <span class="tag" onclick="showTag(event,'Service bus','Eventing &amp; async processing')">Service bus</span>
-            <span class="tag" onclick="showTag(event,'Distributed log / event stream','Eventing &amp; async processing')">Distributed log / event stream</span>
-            <span class="tag" onclick="showTag(event,'Dead-letter queue','Eventing &amp; async processing')">Dead-letter queue</span>
-            <span class="tag" onclick="showTag(event,'Event schema registry','Eventing &amp; async processing')">Event schema registry</span>
-            <span class="tag" onclick="showTag(event,'Background job processor','Eventing &amp; async processing')">Background job processor</span>
-            <span class="tag" onclick="showTag(event,'Cron / scheduled task runner','Eventing &amp; async processing')">Cron / scheduled task runner</span>
-            <span class="tag" onclick="showTag(event,'Consumer lag monitor','Eventing &amp; async processing')">Consumer lag monitor</span>
-            <span class="tag" onclick="showTag(event,'Replay tooling','Eventing &amp; async processing')">Replay tooling</span>
+            <span class="tag">Message queue</span>
+            <span class="tag">Service bus</span>
+            <span class="tag">Distributed log / event stream</span>
+            <span class="tag">Dead-letter queue</span>
+            <span class="tag">Event schema registry</span>
+            <span class="tag">Background job processor</span>
+            <span class="tag">Cron / scheduled task runner</span>
+            <span class="tag">Consumer lag monitor</span>
+            <span class="tag">Replay tooling</span>
           </div>
           <div class="detail">
             <div class="detail-grid">
-              <div class="detail-cell"><div class="dc-label">Platform view</div><p>Decoupled communication through asynchronous messaging and streams. Enables resilient workflows without synchronous dependency chains. All consumers must tolerate duplicate and delayed messages safely.</p></div>
-              <div class="detail-cell"><div class="dc-label">Developer view</div><p>A coordination mechanism that moves complexity out of individual services but introduces its own operational surface. Async failure modes must be legible and testable without deep expertise in the messaging platform.</p></div>
+              <div class="detail-cell">
+                <div class="dc-label">Platform view</div>
+                <p>Decoupled communication through asynchronous messaging and streams. Enables resilient workflows without synchronous dependency chains. All consumers must tolerate duplicate and delayed messages safely.</p>
+              </div>
+              <div class="detail-cell">
+                <div class="dc-label">Developer view</div>
+                <p>A coordination mechanism that moves complexity out of individual services but introduces its own operational surface. Async failure modes must be legible and testable without deep expertise in the underlying messaging platform.</p>
+              </div>
             </div>
             <div class="invariant-row">
-              <div class="inv-block"><div class="inv-label">Platform invariant</div><p>All consumers must tolerate duplicate and delayed messages safely.</p></div>
-              <div class="inv-block"><div class="inv-label">Developer invariant</div><p>Developers can inspect, replay, and diagnose their consumers without requiring platform team involvement.</p></div>
+              <div class="inv-block">
+                <div class="inv-label">Platform invariant</div>
+                <p>All consumers must tolerate duplicate and delayed messages safely.</p>
+              </div>
+              <div class="inv-block">
+                <div class="inv-label">Developer invariant</div>
+                <p>Developers can inspect, replay, and diagnose their consumers without requiring platform team involvement.</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       <!-- D: Deployment -->
-      <div class="layer l-gray" onclick="toggleLayer(event,this)">
+      <div class="layer l-gray" onclick="toggle(this)">
         <div class="layer-letter">D</div>
         <div class="layer-divider"></div>
         <div class="layer-content">
           <div class="layer-name">Deployment - control plane &amp; configuration <span class="open-indicator">&#9660;</span></div>
           <div class="layer-desc">Intent becomes reality - configuration is code, and drift is a bug</div>
           <div class="tags">
-            <span class="tag" onclick="showTag(event,'GitOps controller','Deployment')">GitOps controller</span>
-            <span class="tag" onclick="showTag(event,'Infrastructure-as-code tool','Deployment')">Infrastructure-as-code tool</span>
-            <span class="tag" onclick="showTag(event,'Secret management system','Deployment')">Secret management system</span>
-            <span class="tag" onclick="showTag(event,'Configuration store','Deployment')">Configuration store</span>
-            <span class="tag" onclick="showTag(event,'Feature flag service','Deployment')">Feature flag service</span>
-            <span class="tag" onclick="showTag(event,'Policy engine','Deployment')">Policy engine</span>
-            <span class="tag" onclick="showTag(event,'Drift detection tool','Deployment')">Drift detection tool</span>
-            <span class="tag" onclick="showTag(event,'Change preview / dry-run','Deployment')">Change preview / dry-run</span>
-            <span class="tag" onclick="showTag(event,'Audit log store','Deployment')">Audit log store</span>
+            <span class="tag">GitOps controller</span>
+            <span class="tag">Infrastructure-as-code tool</span>
+            <span class="tag">Secret management system</span>
+            <span class="tag">Configuration store</span>
+            <span class="tag">Feature flag service</span>
+            <span class="tag">Policy engine</span>
+            <span class="tag">Drift detection tool</span>
+            <span class="tag">Change preview / dry-run</span>
+            <span class="tag">Audit log store</span>
           </div>
           <div class="detail">
             <div class="detail-grid">
-              <div class="detail-cell"><div class="dc-label">Platform view</div><p>System-wide configuration, orchestration, and state convergence. Desired system state is consistently applied and auditable. Drift is a failure condition, not an accepted state.</p></div>
-              <div class="detail-cell"><div class="dc-label">Developer view</div><p>The mechanism through which intent becomes running system behaviour - and the source of unexpected surprises when it drifts. Configuration changes must be discoverable and safe without platform team gatekeeping.</p></div>
+              <div class="detail-cell">
+                <div class="dc-label">Platform view</div>
+                <p>System-wide configuration, orchestration, and state convergence. Desired system state is consistently applied and auditable. System state converges deterministically toward declared configuration - drift is a failure condition, not an accepted state.</p>
+              </div>
+              <div class="detail-cell">
+                <div class="dc-label">Developer view</div>
+                <p>The mechanism through which a developer's intent becomes running system behaviour - and the source of unexpected surprises when it drifts. Configuration changes must be discoverable, reviewable, and safe to make without platform team gatekeeping.</p>
+              </div>
             </div>
             <div class="invariant-row">
-              <div class="inv-block"><div class="inv-label">Platform invariant</div><p>System state converges deterministically toward declared configuration with full auditability.</p></div>
-              <div class="inv-block"><div class="inv-label">Developer invariant</div><p>Developers can propose, preview, and understand the effect of a configuration change before it reaches production.</p></div>
+              <div class="inv-block">
+                <div class="inv-label">Platform invariant</div>
+                <p>System state converges deterministically toward declared configuration with full auditability.</p>
+              </div>
+              <div class="inv-block">
+                <div class="inv-label">Developer invariant</div>
+                <p>Developers can propose, preview, and understand the effect of a configuration change before it reaches production.</p>
+              </div>
             </div>
           </div>
         </div>
@@ -384,25 +501,29 @@
     </div>
 
     <!-- Resilience band -->
-    <div class="resilience-band" id="res-band">
-      <div class="r-header" onclick="toggleRes()">
-        <div class="r-label">Resilience - applied across every layer above <span style="font-family:JetBrains Mono,monospace;font-size:0.7rem;opacity:0.4;">&#9660;</span></div>
-      </div>
+    <div class="resilience-band" onclick="toggleR(this)">
+      <div class="r-label">Resilience - applied across every layer above <span style="font-family:JetBrains Mono,monospace;font-size:0.7rem;opacity:0.4;">&#9660;</span></div>
       <div class="tags">
-        <span class="tag" onclick="showTag(event,'Circuit breaker library','Resilience')">Circuit breaker library</span>
-        <span class="tag" onclick="showTag(event,'Retry middleware','Resilience')">Retry middleware</span>
-        <span class="tag" onclick="showTag(event,'Bulkhead / thread pool isolation','Resilience')">Bulkhead / thread pool isolation</span>
-        <span class="tag" onclick="showTag(event,'Timeout policy engine','Resilience')">Timeout policy engine</span>
-        <span class="tag" onclick="showTag(event,'Chaos / fault injection framework','Resilience')">Chaos / fault injection framework</span>
-        <span class="tag" onclick="showTag(event,'Load shedding proxy','Resilience')">Load shedding proxy</span>
-        <span class="tag" onclick="showTag(event,'Health check endpoint standard','Resilience')">Health check endpoint standard</span>
-        <span class="tag" onclick="showTag(event,'Graceful degradation toggle','Resilience')">Graceful degradation toggle</span>
-        <span class="tag" onclick="showTag(event,'Backoff strategy','Resilience')">Backoff strategy</span>
+        <span class="tag">Circuit breaker library</span>
+        <span class="tag">Retry middleware</span>
+        <span class="tag">Bulkhead / thread pool isolation</span>
+        <span class="tag">Timeout policy engine</span>
+        <span class="tag">Chaos / fault injection framework</span>
+        <span class="tag">Load shedding proxy</span>
+        <span class="tag">Health check endpoint standard</span>
+        <span class="tag">Graceful degradation toggle</span>
+        <span class="tag">Backoff strategy</span>
       </div>
       <div class="r-detail">
         <div class="detail-grid" style="margin-top:1rem;">
-          <div class="detail-cell"><div class="dc-label" style="color:#534AB7;">Platform view</div><p style="color:#3C3489;">System behaviour under partial or total failure conditions. Prevent cascading failures and preserve system usability under stress. No single dependency failure is allowed to exhaust system-wide resources.</p></div>
-          <div class="detail-cell"><div class="dc-label" style="color:#534AB7;">Developer view</div><p style="color:#3C3489;">The difference between a developer's service degrading gracefully and taking down everything that depends on it. Platform-provided resilience defaults must be safe out of the box - opt out, never opt in.</p></div>
+          <div class="detail-cell">
+            <div class="dc-label" style="color:#534AB7;">Platform view</div>
+            <p style="color:#3C3489;">System behaviour under partial or total failure conditions. Prevent cascading failures and preserve system usability under stress. No single dependency failure is allowed to exhaust system-wide resources.</p>
+          </div>
+          <div class="detail-cell">
+            <div class="dc-label" style="color:#534AB7;">Developer view</div>
+            <p style="color:#3C3489;">The difference between a developer's service degrading gracefully and taking down everything that depends on it. Platform-provided resilience defaults must be safe out of the box - a developer opts out, never opts in.</p>
+          </div>
         </div>
         <div class="invariants" style="margin-top:0.85rem;padding-top:0.85rem;border-top:1px solid #AFA9EC;">
           <div class="invariant"><strong>Platform invariant:</strong> no single dependency failure may exhaust system-wide resources</div>
@@ -410,97 +531,19 @@
         </div>
       </div>
     </div>
+
   </div>
 </div>
-<script>
-const S = {
-  "API gateway": { cat:"Edge & traffic control", what:"An API gateway is the single entry point for all client requests to backend services. It handles routing, enforces authentication and authorisation policies, applies rate limits, transforms payloads where needed, and provides a unified API surface to external consumers. It decouples the external API contract from internal service topology, meaning you can reorganise services internally without breaking clients.", tradeoffs:["Centralising all traffic through one gateway creates a potential single point of failure - it must be highly available and scaled accordingly.","Gateways can become a dumping ground for business logic. Keep them focused on cross-cutting concerns like auth and routing, not service-specific transformation.","Adding a gateway hop increases latency marginally. For latency-sensitive paths this needs to be measured.","A monolithic gateway shared by all teams can become a deployment bottleneck - consider a federated or per-team model at scale."], oss:["Kong","Traefik","Envoy","APISIX","Tyk"] },
-  "Web application firewall": { cat:"Edge & traffic control", what:"A WAF inspects HTTP traffic and blocks requests that match known attack patterns - SQL injection, cross-site scripting, path traversal, and similar. It operates at layer 7, understanding the shape of HTTP requests rather than just IP addresses and ports. WAFs can run in detection mode (log only) or blocking mode, and rules can be tuned to reduce false positives for your specific application behaviour.", tradeoffs:["WAF rules require ongoing tuning. Default rulesets produce false positives that can block legitimate traffic, especially for APIs with unusual payloads.","A WAF is not a substitute for secure application code. It is a defence-in-depth measure, not a primary security control.","Blocking mode with aggressive rules can cause hard-to-diagnose failures for developers whose requests are silently dropped.","Performance overhead is low in modern implementations but varies by ruleset complexity."], oss:["ModSecurity","Coraza","OpenAppSec"] },
-  "DDoS protection": { cat:"Edge & traffic control", what:"DDoS protection absorbs or deflects volumetric attacks that aim to exhaust your bandwidth, connection capacity, or compute resources before they reach your services. It typically operates at network and transport layers (L3/L4) for volumetric floods, and at the application layer (L7) for more sophisticated HTTP-based attacks. Protection services use anycast routing and scrubbing centres to absorb attack traffic and filter it from legitimate requests.", tradeoffs:["Effective DDoS protection almost always requires upstream network capacity that exceeds what you can provision yourself - this is one area where managed services have a structural advantage.","Mitigation introduces latency during an attack as traffic is scrubbed and re-routed.","Sophisticated application-layer attacks blur the line between DDoS and abuse - detection requires application-level context.","Thresholds that trigger mitigation need tuning to avoid triggering on legitimate traffic spikes."], oss:["Nginx with rate limiting modules","Fail2ban","CrowdSec"] },
-  "TLS termination proxy": { cat:"Edge & traffic control", what:"A TLS termination proxy handles the encryption and decryption of HTTPS traffic at the edge, so internal services can communicate over plaintext HTTP within a trusted network boundary. It manages certificates, negotiates cipher suites, and forwards decrypted requests upstream. This centralises certificate management and offloads the computational cost of TLS from application servers.", tradeoffs:["Terminating TLS at the edge means traffic inside your network is unencrypted. This is acceptable in a well-segmented private network but a risk if internal east-west traffic is not controlled.","Certificate rotation must be automated - manual rotation causes outages and is error-prone at scale.","Choosing cipher suites requires balancing security posture against compatibility with older clients.","mTLS for internal service communication is a separate concern from edge termination."], oss:["Nginx","HAProxy","Caddy","Envoy","Traefik"] },
-  "CDN": { cat:"Edge & traffic control", what:"A content delivery network caches static and cacheable dynamic content at edge nodes distributed geographically close to users, reducing latency and offloading traffic from origin servers. For APIs, CDNs can cache GET responses, reduce time-to-first-byte globally, and absorb traffic spikes. They also provide a layer of protection by absorbing attacks before they reach your infrastructure.", tradeoffs:["Cache invalidation is hard. Stale content served from edge nodes after updates is a common source of subtle bugs, especially for APIs serving frequently changing data.","CDNs are most effective for cacheable content. Dynamic, personalised, or authenticated responses benefit less or not at all.","Debugging cache behaviour requires access to CDN logs and cache headers, which developers may not have by default.","Global routing means origin requests may come from CDN edge IP ranges - access control lists need to account for this."], oss:["Varnish","Squid","Apache Traffic Server"] },
-  "Rate limiter": { cat:"Edge & traffic control", what:"A rate limiter controls how many requests a client, user, or service can make within a time window. It protects services from being overwhelmed by a single misbehaving caller, prevents abuse, and enforces fair usage across tenants. Rate limiting can be applied by IP address, API key, user identity, or any other request attribute. Common algorithms include token bucket, fixed window, and sliding window.", tradeoffs:["Choosing the right limit values requires understanding legitimate usage patterns. Limits set too low frustrate real users; too high and they offer no protection.","Distributed rate limiting across multiple gateway instances requires a shared state store for counter coordination, adding latency and a dependency.","Rate limit responses (HTTP 429) need to communicate retry-after timing so clients can back off gracefully rather than immediately retrying.","Per-endpoint vs global limits are different tools - a user might legitimately hit one endpoint heavily while respecting overall limits."], oss:["Kong rate-limiting plugin","Nginx limit_req","Redis + custom middleware","Envoy rate limit service"] },
-  "DNS load balancer": { cat:"Edge & traffic control", what:"DNS-based load balancing distributes traffic across multiple IP addresses by returning different A or CNAME records to different clients. It can direct traffic based on geography, health (removing unhealthy endpoints from DNS responses), or weighted distribution for gradual rollouts. It operates entirely outside the request path, meaning zero added latency per request, but DNS TTLs mean failover is slower than in-path load balancing.", tradeoffs:["DNS TTLs mean traffic does not shift instantly when a record changes. During failover, some clients continue hitting an unhealthy endpoint until TTL expires.","Client DNS caching can ignore TTLs entirely, causing sticky routing that does not respond to changes.","DNS load balancing alone does not provide connection-level health checking - combine it with in-path load balancers for per-request health awareness.","Geographic routing accuracy depends on the client's DNS resolver, not the client's actual location."], oss:["PowerDNS with health checking","CoreDNS","BIND with views"] },
-  "Ingress controller": { cat:"Edge & traffic control", what:"An ingress controller manages external HTTP(S) access to services running inside a container orchestration cluster. It watches for Ingress resource definitions and configures a proxy to route traffic accordingly - mapping hostnames and URL paths to backend services. It handles TLS termination, path-based routing, and often integrates with certificate managers for automated certificate issuance.", tradeoffs:["Ingress controllers are cluster-wide shared infrastructure. A misconfigured Ingress resource from one team can affect routing for others.","The Ingress API is intentionally minimal - advanced routing features require controller-specific annotations that are not portable across implementations.","The newer Gateway API offers a more expressive and portable model but adoption is still maturing.","Multiple ingress controllers can run in one cluster but coordination and namespace isolation need explicit design."], oss:["ingress-nginx","Traefik","Contour","HAProxy Ingress","Emissary-ingress"] },
-  "Bot detection": { cat:"Edge & traffic control", what:"Bot detection distinguishes automated traffic from human users by analysing behavioural signals - request rate, browser fingerprint, JavaScript execution, mouse movement patterns, and known bot signatures. It protects against credential stuffing, scraping, inventory hoarding, and fake account creation. Detection can be passive (analysing traffic without challenging the user) or active (serving challenges like CAPTCHAs to suspicious clients).", tradeoffs:["Aggressive bot detection produces false positives that challenge or block legitimate users, particularly those using accessibility tools or unusual browsers.","Sophisticated bots run real browsers and mimic human behaviour, making purely signature-based detection increasingly ineffective.","CAPTCHAs impose friction on all users flagged as suspicious - this is a tradeoff between security and user experience that needs explicit product decisions.","Bot detection signals are useful for fraud and abuse teams beyond just blocking - consider whether detected-but-allowed bot traffic should be flagged for downstream review."], oss:["CrowdSec","fail2ban","Nginx fingerprinting modules"] },
-  "Container runtime": { cat:"Compute & service architecture", what:"A container runtime is the low-level software that actually creates and runs containers - managing namespaces, cgroups, filesystem layers, and networking interfaces. It executes instructions from a container orchestrator, pulling images, setting up isolated environments, and managing the container lifecycle. The runtime enforces the isolation between containers and the host, and between containers sharing a host.", tradeoffs:["Different runtimes offer different security profiles. Some use hypervisor-level isolation (stronger boundary but higher overhead), others use standard Linux namespaces (lighter but sharing the kernel).","Runtime choice is usually invisible to developers but matters enormously for security-sensitive workloads. Standardise on one runtime per environment to simplify operations.","Image layer caching at the runtime level affects startup time. Large base images or many layers slow cold starts.","The CRI standard means most runtimes are interchangeable from the orchestrator's perspective, reducing lock-in."], oss:["containerd","CRI-O","gVisor","Kata Containers"] },
-  "Container orchestrator": { cat:"Compute & service architecture", what:"A container orchestrator automates the scheduling, scaling, and lifecycle management of containerised workloads across a cluster of machines. It decides which node runs which container, restarts failed containers, scales workloads based on resource usage or custom metrics, manages rolling deployments, and provides service discovery. It abstracts the underlying machines into a pool of compute capacity.", tradeoffs:["Orchestrators introduce significant operational complexity. The platform team needs deep expertise to run them reliably - consider the cost of that expertise before building on them.","The scheduling model can produce unexpected placement behaviour. Resource requests and limits must be set accurately or workloads starve each other.","Rolling deployments and self-healing can mask underlying problems. A service that crashes and restarts repeatedly may appear healthy to the orchestrator.","Multi-tenancy requires careful namespace and RBAC design. Without it, teams can accidentally affect each other's workloads."], oss:["Kubernetes","Nomad","Docker Swarm"] },
-  "Service mesh": { cat:"Compute & service architecture", what:"A service mesh manages service-to-service communication within a cluster by injecting a proxy alongside each service instance. The mesh handles mutual TLS between services, traffic routing and load balancing, retries and circuit breaking, and observability - generating spans and metrics for every service-to-service call. All of this happens transparently without requiring changes to application code.", tradeoffs:["A service mesh adds a sidecar proxy to every pod, consuming memory and CPU and adding network hops. This overhead is measurable and needs to be justified.","Mesh control planes are complex distributed systems in their own right. Misconfiguration can silently break service-to-service communication across the entire cluster.","The promise of zero-code observability and security is largely true, but debugging mesh behaviour requires mesh-specific tooling and knowledge.","Not all workloads need a full mesh. A simpler approach - explicit mTLS libraries and structured logging - can achieve similar outcomes with less operational complexity."], oss:["Istio","Linkerd","Cilium","Consul Connect"] },
-  "Internal load balancer": { cat:"Compute & service architecture", what:"An internal load balancer distributes traffic between instances of the same service within the cluster or private network, enabling horizontal scaling. Unlike edge load balancers, it operates entirely within private network space and is not exposed to external traffic. It performs health checking on backend instances and removes unhealthy ones from rotation, providing seamless failover when individual instances crash or are replaced during deployments.", tradeoffs:["Connection-based load balancers distribute connections, not requests. Long-lived connections (gRPC, WebSocket) can cause imbalanced load if one connection carries many requests.","Health check configuration needs careful design - checks too aggressive cause unnecessary instance churn; checks too lenient keep unhealthy instances in rotation.","Sticky sessions are sometimes needed for stateful workloads but undermine the scaling and resilience benefits of load balancing.","In service mesh environments the mesh sidecar often handles internal load balancing, making a separate load balancer redundant."], oss:["HAProxy","Nginx","Envoy","MetalLB (for bare metal)"] },
-  "Sidecar proxy": { cat:"Compute & service architecture", what:"A sidecar proxy runs as a companion container alongside an application container, intercepting all inbound and outbound network traffic. It implements network concerns - mTLS, retries, circuit breaking, traffic shaping, telemetry - without any changes to the application code. The sidecar pattern is the foundation of service mesh architectures, but can also be used selectively for specific workloads without a full mesh.", tradeoffs:["Each sidecar consumes memory and CPU on every pod. At scale with thousands of pods, this adds up significantly.","The sidecar intercepts traffic transparently, which makes debugging network issues harder. Traffic appears to come from localhost, masking the actual network path.","Sidecar upgrades require rolling restarts of all pods in the cluster, which is operationally disruptive and needs careful planning.","The eBPF-based alternative (ambient mesh) removes the per-pod sidecar overhead but is less mature."], oss:["Envoy","Linkerd-proxy","MOSN"] },
-  "Service discovery registry": { cat:"Compute & service architecture", what:"A service discovery registry is the source of truth for where services are running - mapping service names to network addresses and ports. Services register themselves on startup and deregister on shutdown. Clients query the registry to find where to send requests rather than relying on static configuration. Health checking is typically integrated so only healthy instances appear in the registry.", tradeoffs:["The registry itself becomes a critical dependency - if it is unavailable, services cannot discover each other. It must be highly available and have a well-understood failure mode.","Registration and deregistration timing introduces windows where stale entries exist. Clients need to handle connection failures to deregistered instances gracefully.","In Kubernetes environments the built-in DNS and endpoint system largely replaces a separate registry. Adding an external registry introduces duplication.","Registry data can become stale if crash detection is too slow. Health check intervals and timeouts determine how quickly failed instances are removed."], oss:["Consul","etcd","Zookeeper","CoreDNS (in Kubernetes)"] },
-  "Deployment pipeline": { cat:"Compute & service architecture", what:"A deployment pipeline is the automated sequence of steps that takes code from a developer's commit to running in production - building artifacts, running tests, publishing images, and deploying to environments in sequence. It enforces quality gates, provides an audit trail of every deployment, and makes the path from code to production consistent and repeatable.", tradeoffs:["Pipelines that take too long become a bottleneck and create pressure to skip stages. Optimise for speed without sacrificing test coverage - parallelise where possible.","Shared pipelines across many teams can become a source of contention and a platform team bottleneck. Self-service pipeline configuration is important at scale.","The pipeline definition is code that also needs to be tested and reviewed. Pipeline configuration drift is a common source of deployment failures.","Rollback capability needs explicit design. Knowing how to get back to the previous state quickly is as important as knowing how to deploy forward."], oss:["Tekton","Argo Workflows","Dagger","Woodpecker CI","Jenkins"] },
-  "Internal developer portal": { cat:"Compute & service architecture", what:"An internal developer portal is the central hub where developers discover platform capabilities, services, documentation, and tooling. It surfaces a service catalogue, documentation, runbooks, API specs, and self-service actions like spinning up environments or provisioning infrastructure. It reduces the need for developers to know who to ask and replaces tribal knowledge with searchable, structured information.", tradeoffs:["A portal is only as valuable as the content kept up to date within it. Stale documentation is worse than no documentation.","Building a portal is easier than making developers actually use it. Adoption requires integration with existing workflows rather than expecting developers to navigate to it proactively.","Custom-built portals accumulate technical debt quickly. Starting with an existing framework and extending it is usually preferable to building from scratch.","The portal should be the interface to the platform, not the implementation. Capabilities surface through the portal but live in the underlying systems."], oss:["Backstage","Port","Cortex"] },
-  "Local dev environment tool": { cat:"Compute & service architecture", what:"A local development environment tool replicates enough of the production environment on a developer's machine that they can run and debug their service without deploying to a shared environment. This includes running dependent services, configuring networking, and managing environment variables. The goal is local-to-production parity - code that works locally should work in production without surprises.", tradeoffs:["Full local replication of a complex microservices environment is impractical. The tradeoff is deciding which dependencies to run locally versus stub or point at a shared dev environment.","Local environment tooling is often the most neglected part of the platform. It directly affects developer productivity and onboarding time but is less visible than production infrastructure.","Environment configuration drift between local, staging, and production is a persistent source of 'works on my machine' bugs. Treat local configuration as code.","Resource-constrained developer machines can cause performance differences that mask real production issues."], oss:["Tilt","Skaffold","Garden","DevSpace","Docker Compose"] },
-  "Service template / scaffold": { cat:"Compute & service architecture", what:"A service template or scaffold is a pre-built starting point for a new service that encodes platform conventions - directory structure, build configuration, observability instrumentation, health check endpoints, Dockerfile, deployment manifests, and CI pipeline definition. A developer who uses the scaffold gets a service that is immediately deployable and platform-compliant.", tradeoffs:["Templates drift from platform standards as the platform evolves. Updating already-generated services is harder than updating the template. Design for migration, not just generation.","Opinionated templates reduce cognitive load for the common case but create friction for non-standard needs. The escape hatch for unusual requirements needs to be explicit and well-documented.","If the template is the only documentation of platform conventions, undocumented conventions accumulate. Templates should reflect documented standards, not replace them.","Template adoption requires trust. Developers adopt templates when they see other teams using them successfully and when onboarding is faster with them."], oss:["Cookiecutter","Backstage Software Templates","Yeoman","Copier"] },
-  "Structured log aggregator": { cat:"Observability & diagnostics", what:"A structured log aggregator collects log output from all services and infrastructure, normalises it into a consistent schema, and makes it searchable and queryable in a central location. Structured logs in JSON or key-value format are far more useful than plaintext logs because fields can be filtered, aggregated, and correlated without regex parsing. The aggregator ships logs from each source, buffers them against backpressure, and forwards them to a storage backend.", tradeoffs:["Log volume grows extremely fast at scale. Without log level discipline and sampling, storage costs become significant. Debug logs should never reach production aggregation.","Centralised logging creates a dependency for incident diagnosis. If the logging pipeline is down during an incident, you are diagnosing blind. Design for degraded operation.","Cardinality explosion in structured fields (logging unique request IDs as indexed fields) can cause index performance problems in search backends.","Sensitive data in logs (tokens, PII) is a security and compliance risk. Log scrubbing needs to be part of the pipeline, not left to individual services."], oss:["Fluent Bit","Fluentd","Vector","Logstash","OpenTelemetry Collector"] },
-  "Metrics collection agent": { cat:"Observability & diagnostics", what:"A metrics collection agent scrapes or receives numeric telemetry from services and infrastructure - request rates, error rates, latency percentiles, resource utilisation - and forwards it to a time-series storage backend. Metrics are the most efficient form of telemetry for real-time alerting and dashboarding because they are pre-aggregated. The agent runs close to the source to minimise data loss and network overhead.", tradeoffs:["The pull model (agent scrapes endpoints) and push model (services push metrics) have different operational properties. Pull is easier to reason about but requires the agent to reach every service.","Metric cardinality is the primary cost driver. Labels with high cardinality (user IDs, request IDs) create millions of unique time series and can cause storage and query performance problems.","Agents add memory and CPU overhead to each node. This is usually small but needs to be accounted for in resource planning.","Metric naming conventions across teams need governance. Inconsistent naming makes cross-service dashboards and alerts impossible to build reliably."], oss:["Prometheus","OpenTelemetry Collector","Telegraf","Vector"] },
-  "Time-series database": { cat:"Observability & diagnostics", what:"A time-series database (TSDB) is purpose-built for storing and querying numeric data points indexed by time. Unlike a general-purpose database, a TSDB uses compression algorithms optimised for time-ordered data, supports downsampling (reducing resolution of old data), and provides query languages designed for time-range aggregations and rate calculations. It is the storage layer behind dashboards and alerting.", tradeoffs:["TSDBs trade general-purpose query flexibility for time-oriented performance. Complex joins or lookups across unrelated dimensions are difficult or impossible.","Long-term metric retention is expensive. Downsampling saves storage but loses resolution for historical analysis.","High-cardinality data causes memory and storage problems in most TSDBs. Schema design requires careful label discipline before data starts flowing.","Query performance degrades at very large scale. Horizontal scalability varies significantly between implementations."], oss:["Prometheus","VictoriaMetrics","InfluxDB","Thanos","Cortex","Mimir"] },
-  "Distributed tracing system": { cat:"Observability & diagnostics", what:"A distributed tracing system records the path a single request takes through multiple services, capturing timing, metadata, and errors at each step. Each service adds a span to the trace, and spans are stitched together by a shared trace ID propagated through request headers. The result is a visual timeline showing exactly where time was spent and where failures occurred across service boundaries.", tradeoffs:["Trace context must be propagated consistently across every service in the call chain. Any service that drops the trace header breaks the trace. This requires buy-in and instrumentation across all services.","Collecting 100% of traces is expensive. Sampling is necessary at scale, but sampled traces can miss rare error cases. Tail-based sampling is more effective than head-based but more complex.","Traces are most useful when spans include meaningful attributes. Generic traces that only show service-to-service calls provide limited diagnostic value.","Storage and query costs are significant for high-traffic systems. Retention policies need to balance cost against the need to investigate historical incidents."], oss:["Jaeger","Zipkin","Tempo","OpenTelemetry (SDK + Collector)"] },
-  "Alerting engine": { cat:"Observability & diagnostics", what:"An alerting engine evaluates metric or log data against threshold conditions and fires notifications when conditions are met. Good alerting is the difference between knowing about a problem before users do and finding out from a bug report. Effective alerts are based on user-impacting symptoms (error rate up, latency up) rather than causes (CPU high, disk full).", tradeoffs:["Alert fatigue is the primary failure mode. Too many low-signal alerts cause teams to start ignoring notifications. Every alert should be actionable.","Threshold-based alerts have low sensitivity to gradual degradation. Anomaly-based alerting catches these but produces more false positives.","Alert routing (getting the right alert to the right person) is as important as alert quality. Routing that sends everything to the whole team creates shared numbness.","Alert rules need the same version control and review process as code. Unreviewed alerting changes are a common source of silent gaps in coverage."], oss:["Prometheus Alertmanager","Grafana Alerting","Kapacitor","ElastAlert"] },
-  "Dashboarding platform": { cat:"Observability & diagnostics", what:"A dashboarding platform visualises metrics, logs, and trace data as charts, graphs, and tables that make system state readable at a glance. Dashboards serve multiple audiences - on-call engineers need real-time status during incidents, engineering teams need trend data for capacity planning, and business stakeholders need high-level health indicators.", tradeoffs:["Dashboard proliferation is a common problem. Dozens of dashboards created during incidents and never maintained accumulate quickly. Curate a small set of authoritative dashboards.","Dashboards built for one context are often reused in another where they are misleading. A dashboard showing absolute request counts is useful for capacity planning but not for incident response.","Dashboards can create false confidence. A system that looks healthy on its dashboard metrics may be failing in ways not captured.","Sharing dashboards requires access control. Sensitive business metrics need visibility restrictions."], oss:["Grafana","Chronograf","Kibana"] },
-  "On-call routing tool": { cat:"Observability & diagnostics", what:"An on-call routing tool manages who receives alerts at any given time, based on rotation schedules, escalation policies, and team ownership. It ensures the right person is paged for the right alert, that alerts escalate if unacknowledged, and that on-call schedules are maintained and visible. It also typically provides the incident communication channel.", tradeoffs:["On-call routing only works if service ownership is clearly defined and kept up to date. Orphaned services with no owner create alerts that go nowhere.","Escalation policies need to balance fast escalation against alert fatigue for secondary on-call engineers.","On-call tooling does not solve on-call culture problems. If on-call is painful, routing the pages more efficiently reduces symptoms without addressing root causes.","Integration between alerting, routing, and incident communication tools needs to be tight. Friction in this path extends incident response time."], oss:["OnCall (Grafana)","Cabot","Dispatch"] },
-  "Error tracking service": { cat:"Observability & diagnostics", what:"An error tracking service captures unhandled exceptions and errors from application code, groups them by root cause, and surfaces them with context - the request that caused the error, the user affected, the deployment version. It bridges the gap between logs (which capture everything but are hard to filter) and alerts (which fire on rate thresholds). Error tracking lets developers triage which bugs are new, which are regressions, and which are most impactful.", tradeoffs:["Error volume can be enormous. Without noise reduction (ignoring known non-actionable errors, grouping correctly), the error tracker becomes a stream that nobody reads.","Error tracking requires SDK instrumentation in every service. Coverage is only as good as instrumentation discipline.","Grouping heuristics can merge unrelated errors under the same issue, or split one root cause into many separate issues, both of which make triage harder.","Sensitive data in stack traces and error context needs scrubbing before being sent to any third-party service."], oss:["GlitchTip","Sentry (self-hosted)","Bugsink"] },
-  "Telemetry SDK": { cat:"Observability & diagnostics", what:"A telemetry SDK is a library integrated into application code that emits traces, metrics, and logs in a standardised format. It provides the instrumentation primitives - creating spans, recording metrics, attaching context - that feed the observability pipeline. The OpenTelemetry project has become the standard SDK approach, providing vendor-neutral instrumentation that can be routed to any compatible backend.", tradeoffs:["Auto-instrumentation covers the common cases well but misses business-logic-level context that only developers can add manually.","SDK overhead is small but measurable at very high request volumes. Sampling and batching configuration affects both overhead and data completeness.","Adopting a non-standard SDK creates lock-in to a specific observability backend. OpenTelemetry is the strongly preferred choice for new instrumentation.","Context propagation across async boundaries requires explicit SDK support and is a common source of broken traces."], oss:["OpenTelemetry (all languages)","Micrometer (JVM)","Prometheus client libraries"] },
-  "Relational database": { cat:"Data & storage", what:"A relational database stores data in structured tables with defined schemas, enforces relationships through foreign keys, and provides ACID transaction guarantees - atomicity, consistency, isolation, and durability. SQL is the query language. It is the right choice for structured data with complex relationships, where data integrity and consistency are more important than raw throughput or horizontal scalability.", tradeoffs:["Relational databases scale vertically more easily than horizontally. For write-heavy workloads at very large scale, this becomes a ceiling.","Schema changes on large tables can be slow and require careful migration planning. Online schema change tools help but add operational complexity.","ACID transactions come with lock overhead. High-concurrency write workloads can experience contention that degrades performance.","The impedance mismatch between object-oriented code and relational tables is a persistent design friction that ORMs reduce but do not eliminate."], oss:["PostgreSQL","MySQL","MariaDB","CockroachDB","SQLite"] },
-  "Document store": { cat:"Data & storage", what:"A document store persists data as semi-structured documents - typically JSON or BSON - without requiring a fixed schema. Each document can have different fields, making it suitable for data with variable structure or data that evolves frequently. Documents are retrieved by ID or queried by field values. Document stores sacrifice the rigid relational model for schema flexibility and, in some implementations, horizontal scalability.", tradeoffs:["Schema flexibility is a double-edged sword. Without discipline, document stores accumulate inconsistent field names and types that make querying unreliable.","Joins across documents are either unsupported or expensive compared to relational databases. Data with meaningful relationships is often better served by a relational model.","Consistency guarantees vary widely between document store implementations. Understand what happens to your data during a network partition before committing.","Indexing strategy is critical for performance. Without the right indexes, queries that work fine at small scale become full collection scans at large scale."], oss:["MongoDB (SSPL)","CouchDB","RavenDB","Couchbase"] },
-  "Key-value store": { cat:"Data & storage", what:"A key-value store is the simplest data model - values are stored and retrieved by a unique key, with no structure imposed on the value itself. It is extremely fast for point lookups and writes, and scales horizontally with straightforward partitioning. It is the right tool for session storage, user preferences, configuration data, feature flags, and any workload where you always know the key.", tradeoffs:["You can only retrieve data if you know the key. There is no efficient way to query by value attributes without building secondary indexes yourself.","Values are opaque to the store. Atomically updating part of a value requires reading, modifying, and writing the whole value, which creates race conditions under concurrent access.","Key design is critical. A poorly designed key namespace causes collisions and makes debugging difficult.","For persistent key-value stores, understanding eviction and durability policies is essential - some implementations are optimised for caching (data can be lost) while others provide persistence guarantees."], oss:["Redis","Valkey","etcd","RocksDB","LMDB"] },
-  "Wide-column store": { cat:"Data & storage", what:"A wide-column store organises data in tables with rows and columns, but unlike a relational database, columns can vary by row and are grouped into column families stored together on disk. This makes it highly efficient for reads that access a specific column family across many rows. It is designed for massive scale and high write throughput, with tunable consistency rather than ACID guarantees.", tradeoffs:["Data modelling is query-driven rather than normalisation-driven. You design your tables around the specific queries you need to run - changing access patterns later requires schema redesign.","Consistency is tunable but not fully ACID. Understanding the consistency levels available and choosing correctly for each operation is essential.","Operational complexity is high. Wide-column stores are distributed systems requiring careful tuning of compaction, replication, and repair processes.","Range queries are efficient when rows are designed around a sort key. Arbitrary queries across columns are not supported without secondary indexes."], oss:["Apache Cassandra","ScyllaDB","HBase"] },
-  "Distributed cache": { cat:"Data & storage", what:"A distributed cache holds frequently accessed data in memory across a cluster of nodes, serving reads at sub-millisecond latency without hitting the primary database. It reduces database load, absorbs traffic spikes, and speeds up response times for hot data. Data is stored with a TTL and evicted when capacity is reached. It is most effective for data that is expensive to compute or retrieve and changes infrequently relative to how often it is read.", tradeoffs:["Cache invalidation is consistently cited as one of the hardest problems in software engineering. When the source of truth changes, stale cached data causes subtle correctness bugs.","A cache miss that hits the database simultaneously from many clients (the thundering herd problem) can overwhelm the database. Cache stampede mitigation requires careful design.","Distributed caches are eventually consistent by default. For strong consistency requirements, the database is the source of truth.","Treating the cache as durable storage is a common mistake. The cache should be reconstructable from the primary store if lost."], oss:["Redis","Valkey","Memcached","Dragonfly"] },
-  "Object / blob storage": { cat:"Data & storage", what:"Object storage persists unstructured data - files, images, videos, backups, logs, ML model artifacts - as opaque blobs addressed by a key within a bucket. Unlike a filesystem, objects are immutable once written. Object storage systems are designed for massive scale, high durability through redundant replication, and HTTP-based access. The S3 API has become the de facto standard interface.", tradeoffs:["Object storage is not a filesystem. You cannot efficiently append to an object or read a byte range without special implementation support.","Latency is higher than disk-attached storage. Typical object storage operations take tens to hundreds of milliseconds and it is not suitable for low-latency random access workloads.","Bucket and key naming conventions become important at scale. A flat namespace with millions of objects is hard to manage without consistent prefixing conventions.","Egress costs in cloud environments can be significant. Large-scale reads of stored data can generate unexpected bills."], oss:["MinIO","Ceph (RadosGW)","SeaweedFS","Garage"] },
-  "Search index": { cat:"Data & storage", what:"A search index enables full-text search and complex filtering across large datasets by maintaining an inverted index - a mapping from every unique term to the documents containing it. Beyond text search, modern search engines support faceted filtering, relevance scoring, geospatial queries, and analytics aggregations. It is the right tool when users need to find data by content rather than by a known key.", tradeoffs:["Search indexes are derived data - they are built from a primary source of truth. Keeping the index in sync requires an ingestion pipeline that can introduce lag.","Relevance tuning is an ongoing product and engineering effort. Default relevance scoring may not match user expectations and needs explicit configuration.","Indexing is write-expensive. High-volume write workloads need careful capacity planning and may require write buffering before indexing.","Schema changes may require reindexing the entire dataset, which is time-consuming and requires running old and new indexes in parallel."], oss:["Elasticsearch (SSPL)","OpenSearch","Meilisearch","Typesense","Solr"] },
-  "Schema migration tool": { cat:"Data & storage", what:"A schema migration tool manages the evolution of a database schema as an ordered, versioned sequence of changes that can be applied forward (migrate) and sometimes reversed (rollback). Each migration is tracked in a migrations table so the tool knows which changes have already been applied. It makes database schema changes reproducible, auditable, and safe to apply across environments.", tradeoffs:["Large table migrations can lock the table and cause downtime. Online schema change tools run the migration without locking but add complexity.","Rollback is theoretically possible but practically difficult for destructive changes. Design migrations to be forward-only with explicit compensating migrations rather than relying on rollback.","Migrations need to be backward compatible during the deployment window - the old code must work with the new schema and vice versa.","Migrations are often treated as an afterthought. Including them in the deployment pipeline and making them a first-class part of the release process prevents drift between environments."], oss:["Flyway","Liquibase","Alembic (Python)","Goose (Go)","Atlas"] },
-  "Connection pooler": { cat:"Data & storage", what:"A connection pooler sits between application instances and the database, maintaining a pool of persistent database connections shared across many application requests. Establishing a database connection is expensive. Without a pooler, a service with many concurrent requests would open and close connections for each, exhausting the database's connection limit. The pooler reuses connections and queues requests when the pool is fully utilised.", tradeoffs:["Connection pooling shifts connection exhaustion from the database to the pooler. The pooler itself must be sized correctly and highly available.","Session-level state (temporary tables, transaction isolation settings) is problematic in pooled environments. The pooler must reset session state between uses.","Pool sizing requires balancing database connection limits against application concurrency. Too small a pool and requests queue; too large and the database is overwhelmed.","Pooler failure causes total loss of database connectivity for all services behind it. Run the pooler in a highly available configuration."], oss:["PgBouncer","Pgpool-II","ProxySQL (MySQL)","Odyssey"] },
-  "Point-in-time recovery": { cat:"Data & storage", what:"Point-in-time recovery (PITR) is the ability to restore a database to any specific moment in the past, not just the most recent backup. It works by combining periodic full backups with continuous archiving of transaction logs. In a data loss or corruption scenario, you restore the last full backup and then replay transaction logs up to the target point in time. PITR is the primary safeguard against accidental data deletion or corruption.", tradeoffs:["PITR requires continuous WAL archiving, which has storage and I/O costs. Archiving must be reliable - any gap in the WAL archive limits recovery to before the gap.","Recovery time depends on how much WAL needs to be replayed after the last base backup. Large databases with infrequent base backups can take hours to recover.","The recovery target must be specified precisely. Recovering to 'just before the bad query ran' requires knowing exactly when that was, which requires good audit logging.","PITR protects against data loss, not against data corruption that happened slowly over time. Regular test restores are the only way to verify that recovery actually works."], oss:["pgBackRest","Barman","WAL-G","Velero (Kubernetes persistent volumes)"] },
-  "Message queue": { cat:"Eventing & async processing", what:"A message queue holds messages produced by one service until they are consumed by another, decoupling producers from consumers in time and space. The producer does not need to know whether the consumer is available, and the consumer processes messages at its own pace. Queues provide buffering against traffic spikes, enable retry on failure, and guarantee that each message is processed at least once.", tradeoffs:["Queues introduce eventual consistency between producer and consumer. The state visible to the consumer is always behind the state produced. This is acceptable for many workflows but not all.","Message ordering is often not guaranteed across a queue, particularly in distributed implementations. If ordering matters, it must be designed into the message schema or the consumer logic.","Dead-letter queues holding messages that have failed to process repeatedly need active monitoring. Messages accumulating in a DLQ are an invisible failure mode.","Queue depth is a useful operational metric - rapidly growing depth means consumers are falling behind and may need scaling."], oss:["RabbitMQ","ActiveMQ","NATS","Beanstalkd"] },
-  "Service bus": { cat:"Eventing & async processing", what:"A service bus is a higher-level messaging abstraction that provides routing, transformation, and orchestration of messages between services, often supporting multiple messaging patterns - point-to-point queues, publish-subscribe topics, and request-reply. It provides a managed integration layer that handles the plumbing between heterogeneous services.", tradeoffs:["Service buses can accumulate logic that belongs in services themselves. Routing rules and transformations embedded in the bus make the overall system harder to understand and debug.","A service bus is a shared, central dependency. Its availability directly affects all services connected to it.","The abstraction can obscure what is actually happening to messages in flight. Debugging message routing failures requires deep familiarity with the bus configuration.","Enterprise service buses (ESBs) became notorious for hiding business logic. Modern implementations should focus on transport, not orchestration."], oss:["Apache Camel","MassTransit","NServiceBus (limited OSS)"] },
-  "Distributed log / event stream": { cat:"Eventing & async processing", what:"A distributed log or event stream is an append-only, ordered, replicated log of events that multiple consumers can read independently at their own pace. Unlike a queue, events in a log are retained for a configurable period and can be replayed from any offset. This makes it suitable for event sourcing, CQRS, audit trails, and building derived views by replaying history. It is also well-suited for high-throughput data pipelines.", tradeoffs:["Consumer offset management is a source of complexity. Each consumer must track where it has read to, and mismanaged offsets cause duplicate processing or missed messages.","Retention policy design involves tradeoff between storage cost and the ability to replay history. Long retention allows rebuilding consumers from scratch; short retention means consumers must process in near-real-time.","Exactly-once semantics across producer, stream, and consumer is difficult to achieve and requires coordination at every step. Most systems provide at-least-once by default.","Partitioning strategy determines parallelism and ordering guarantees. Messages in the same partition are ordered; messages across partitions are not. Choosing partition keys correctly is a design decision."], oss:["Apache Kafka","Redpanda","NATS JetStream","Pulsar"] },
-  "Dead-letter queue": { cat:"Eventing & async processing", what:"A dead-letter queue (DLQ) is a holding area for messages that have failed to be processed successfully after a configured number of retry attempts. Rather than blocking the main queue or silently dropping failed messages, they are moved to the DLQ where they can be inspected, diagnosed, and either reprocessed or discarded. A DLQ is an essential safety net for any asynchronous processing system.", tradeoffs:["A DLQ that is never monitored provides no value. Messages accumulating in a DLQ are a silent failure mode that needs alerting.","Reprocessing DLQ messages after fixing a bug requires careful ordering - if the original messages interleaved with others already processed, replaying them may cause incorrect state.","Not all DLQ messages are worth investigating. Distinguishing transient failures (retry them) from permanent failures (discard or escalate) requires classification in the consumer logic.","The DLQ needs its own retention policy. Indefinite retention of failed messages accumulates storage cost and can grow to unmanageable size."], oss:["Built into RabbitMQ, Kafka, SQS, NATS JetStream - not a separate tool"] },
-  "Event schema registry": { cat:"Eventing & async processing", what:"An event schema registry is a central repository that stores and versions the schemas for events flowing through a messaging system. Producers register their event schemas, and consumers retrieve them to deserialise messages correctly. It acts as a contract between producers and consumers, enabling schema evolution without breaking compatibility. It typically enforces compatibility rules and blocks breaking schema changes from being published.", tradeoffs:["The registry becomes a dependency for both producers and consumers. Its availability affects the entire messaging system.","Schema evolution rules (backward, forward, full compatibility) have different implications for producer and consumer deployment order. Understanding which rule is appropriate requires design discipline.","Governance of the registry (who can register schemas, how changes are reviewed) needs explicit process. Without it, breaking schema changes slip through.","Schema registry is often only added after the first breaking schema change causes an outage. Adopting it early prevents the problem rather than solving it after the fact."], oss:["Apicurio Registry","Confluent Schema Registry (community edition)","Buf (for Protobuf)"] },
-  "Background job processor": { cat:"Eventing & async processing", what:"A background job processor runs tasks asynchronously outside the request-response cycle - sending emails, resizing images, generating reports, running data exports. Jobs are enqueued by web processes and executed by worker processes that pick them up from a queue. This allows expensive operations to be offloaded without making users wait, and enables retry on failure.", tradeoffs:["Background jobs must be idempotent - they should produce the same result if run multiple times due to retry. Designing idempotent jobs is harder than it appears, particularly for jobs with side effects.","Job queues are a form of state that needs monitoring. A large backlog of unprocessed jobs is a signal that workers are underpowered or stuck.","Long-running jobs need heartbeat mechanisms so the processor does not assume they have failed and retry them while they are still running.","Job prioritisation allows time-sensitive jobs to jump the queue, but requires careful design to prevent low-priority jobs from starving."], oss:["Sidekiq","Celery","Temporal","River (Go)","Faktory"] },
-  "Cron / scheduled task runner": { cat:"Eventing & async processing", what:"A scheduled task runner executes tasks on a defined time schedule - hourly cleanup jobs, nightly data aggregations, weekly reports. In distributed systems, traditional cron running on a single machine is fragile and not visible to the platform. A distributed scheduled task runner provides a single place to define, manage, and monitor scheduled tasks, with high availability and observability.", tradeoffs:["Distributed schedulers must prevent the same job running simultaneously on multiple workers (distributed lock). Without this, concurrent runs cause duplicate processing.","Time zone handling in scheduled tasks is a persistent source of bugs, particularly across daylight saving time transitions.","A schedule that fires too frequently or a job that takes longer than its interval creates overlapping runs. Both cases need explicit handling.","Scheduled jobs are often neglected in monitoring. A job that silently fails at 3am is not noticed until a downstream consumer complains about missing data."], oss:["Kubernetes CronJob","Ofelia","Supercronic","Temporal (Schedules)","Dkron"] },
-  "Consumer lag monitor": { cat:"Eventing & async processing", what:"A consumer lag monitor tracks how far behind a message consumer is from the head of the queue or stream - the number of messages waiting to be processed. Rising consumer lag indicates that consumers are not keeping up with the rate of production, which is an early warning that processing capacity needs to increase or that a consumer is stuck. It is an essential operational metric for any event-driven system.", tradeoffs:["Lag measured in message count can be misleading if message sizes or processing complexity vary significantly. Lag in bytes or time-to-process may be more meaningful.","Acceptable lag levels depend on business requirements. For a real-time analytics pipeline, seconds of lag is critical; for a nightly batch job, hours of lag is normal.","Consumer lag monitoring requires access to both the broker (to get the head offset) and the consumer (to get the committed offset). Some messaging systems make this easier than others.","Lag that drops to zero and immediately rises again may indicate a consumer processing correctly but at the limit of its capacity."], oss:["Kafka Lag Exporter","Burrow","Built into Redpanda Console","NATS Surveyor"] },
-  "Replay tooling": { cat:"Eventing & async processing", what:"Replay tooling allows events from a stream or log to be re-consumed from a past point - typically to rebuild a consumer's state after a bug fix, populate a new consumer, or backfill a derived dataset. In log-based systems this is native capability controlled by adjusting the consumer offset. In queue-based systems, replay is harder because messages are deleted after consumption, requiring explicit design to support it.", tradeoffs:["Replaying events can cause duplicate side effects if consumers are not idempotent. Before replaying, every downstream effect of the replayed messages needs to be considered.","Large replay operations are time-consuming and may compete with live processing. Plan for the capacity and duration required.","Replaying into a production system while it is live requires careful coordination to avoid inconsistent state during the replay window.","Retention policy limits how far back replay can go. Events older than the retention period are gone. This is an argument for longer retention than you think you need."], oss:["Native in Apache Kafka (offset reset)","Redpanda offset management","NATS JetStream consumer seek"] },
-  "GitOps controller": { cat:"Deployment", what:"A GitOps controller continuously reconciles the actual state of a system with the desired state declared in a Git repository. When a change is committed (a new image version, a configuration update), the controller detects it and applies the change to the running system. If the running system drifts from what is in Git, the controller detects and corrects the drift. Git becomes the single source of truth and the full audit trail.", tradeoffs:["GitOps requires discipline about not making manual changes to live systems. A hotfix applied directly to production without going through Git will be overwritten by the next reconciliation cycle.","Secrets should not be stored in Git. GitOps workflows for secrets require either an external secret management system or encrypted secret storage.","The reconciliation loop has a lag - changes applied to Git may take minutes to reach production depending on poll interval or webhook configuration.","For large environments with many repositories, managing the relationship between application repos and configuration repos adds complexity that needs tooling to navigate."], oss:["Argo CD","Flux CD","Fleet"] },
-  "Infrastructure-as-code tool": { cat:"Deployment", what:"An infrastructure-as-code (IaC) tool defines infrastructure - virtual machines, networks, databases, DNS records, load balancers - as declarative configuration files that can be version-controlled, reviewed, and applied consistently. It replaces manual provisioning through consoles or APIs with repeatable, auditable automation. The tool calculates the difference between current and desired state and applies only the necessary changes.", tradeoffs:["IaC state management (the record of what has been provisioned) is a critical file that must be stored safely and not manually edited. State corruption causes the tool to lose track of what it manages.","The declarative model works well for greenfield infrastructure but can be awkward for incremental changes to existing resources.","IaC creates a lag between code and reality. The code describes intent; the tool applies it. Debugging requires understanding both the code and the actual resource state.","Team conventions for module structure, naming, and state organisation require governance. Without it, IaC codebases become difficult to navigate and maintain."], oss:["Terraform / OpenTofu","Pulumi","Crossplane","Ansible","Helm"] },
-  "Secret management system": { cat:"Deployment", what:"A secret management system stores and controls access to sensitive credentials - database passwords, API keys, TLS certificates, SSH keys - with fine-grained access control, audit logging of every access, and automated rotation. Applications retrieve secrets at runtime rather than having them embedded in code or configuration files. Secrets are kept out of Git, out of container images, and out of environment variables in plaintext.", tradeoffs:["The secret manager itself must be highly available. If it is unreachable, applications that retrieve secrets at startup cannot start. Design applications to cache secrets with a refresh interval.","Secret rotation requires application support. Applications must be able to reload credentials without restarting, which requires intentional design.","Access control for secrets requires the same governance as access control for production systems. Overly broad permissions undermine the entire purpose.","Bootstrapping the secret manager (how does the application authenticate to retrieve its first secret?) is a chicken-and-egg problem that needs a platform-level solution."], oss:["HashiCorp Vault","Infisical","OpenBao","SOPS (file-level encryption)"] },
-  "Configuration store": { cat:"Deployment", what:"A configuration store holds non-secret application configuration - feature settings, tuning parameters, service URLs, environment-specific values - in a centralised, versioned, and auditable location. Applications read configuration at startup or dynamically at runtime. Centralising configuration prevents it from being scattered across environment variables, config files, and hardcoded values in different places.", tradeoffs:["Configuration that changes at runtime without redeployment is powerful but introduces operational complexity. Applications must handle configuration changes gracefully, including reloading without state loss.","The boundary between configuration and secrets is often blurry. A connection string contains both configuration and a secret. This boundary needs a clear convention.","Configuration stores can become a dumping ground for values that should be in code. Not everything that varies between environments needs to be configurable at runtime.","Versioning configuration alongside application code is important - knowing which configuration version was running when an incident occurred is essential for diagnosis."], oss:["etcd","Consul KV","HashiCorp Vault KV","Spring Cloud Config Server","Infisical"] },
-  "Feature flag service": { cat:"Deployment", what:"A feature flag service allows features to be enabled or disabled at runtime for specific users, cohorts, or percentages of traffic, without redeploying the application. It separates deployment (when code goes to production) from release (when users see it), enabling dark launches, gradual rollouts, A/B testing, and instant kill-switches. Flags are evaluated at runtime, so they can be changed instantly without a deployment cycle.", tradeoffs:["Feature flags are technical debt. Every flag added is a code path that needs to be cleaned up when the flag is retired. Without discipline, codebases accumulate hundreds of stale flags.","Flag evaluation latency adds to every request where flags are checked. Flags should be evaluated once per request and cached, not re-evaluated per function call.","Flag targeting rules require user context to be available at evaluation time, which creates a dependency on the identity and session system.","A flag service that is unavailable must have a defined default behaviour for each flag. The failure mode must be a conscious decision per flag."], oss:["Unleash","Flagsmith","OpenFeature (standard)","Flipt"] },
-  "Policy engine": { cat:"Deployment", what:"A policy engine evaluates requests or actions against a set of rules to determine whether they should be permitted. In a platform context it enforces guardrails - this deployment is not allowed to run as root, this service is not allowed to mount this volume, this API key is not permitted to access this resource. Policy is declared as code, versioned, and applied consistently.", tradeoffs:["Policy rules must be tested before being enforced. Untested policies in enforcement mode block legitimate operations and cause incidents. Use audit mode (log violations without blocking) before switching to enforce mode.","Policy complexity grows over time. Rules that interact in non-obvious ways create emergent behaviour that is hard to predict and debug.","Policy evaluation adds latency to every request it intercepts. The overhead is usually small but needs to be measured for latency-sensitive paths.","Policy as code requires the same review process as application code. Policy changes with production impact must be reviewed before merge."], oss:["Open Policy Agent (OPA)","Kyverno","Cedar","Casbin"] },
-  "Drift detection tool": { cat:"Deployment", what:"A drift detection tool continuously compares the actual state of infrastructure or configuration against the declared desired state, and alerts when they diverge. It answers the question 'is what is running what we intended to be running?' Without drift detection, manual changes, failed reconciliations, or external events can silently move the system away from its declared state.", tradeoffs:["Drift detection generates noise if the definition of 'desired state' is not precise. Differences in tag formatting, metadata fields, or non-material properties trigger false drift alerts.","Some drift is intentional (a manual hotfix during an incident). Distinguishing intentional from unintentional drift requires context that automated tools do not have.","Detection without remediation is incomplete. Knowing about drift without a clear process for resolving it creates alert fatigue.","Drift detection across large environments requires significant read access to compare actual vs desired state, which is a broad permission surface that needs securing."], oss:["Argo CD (built-in drift detection)","Flux CD","Driftctl","Terraform plan in CI"] },
-  "Change preview / dry-run": { cat:"Deployment", what:"A change preview or dry-run tool shows what will happen if a configuration or infrastructure change is applied, without actually applying it. It calculates the diff between current and desired state and presents it for review before execution. This is the configuration equivalent of a code review - it surfaces unintended consequences and gives the operator confidence in what a change will do before it affects live systems.", tradeoffs:["Dry-run accuracy depends on the tool's ability to model what will actually happen. Some tools produce accurate previews; others produce plans that diverge from execution due to external state or timing.","Drift between the time a plan is generated and the time it is applied means the plan may no longer accurately represent what will happen. Long-lived plans are unreliable.","Previews that require destructive actions can be alarming even when correct. Teams need to understand the difference between destructive and disruptive.","The preview/apply workflow can create a false sense of safety if previews are not reviewed carefully. Reviewing infrastructure diffs requires domain knowledge that not all reviewers have."], oss:["Terraform plan","Argo CD diff view","Helm --dry-run","kubectl diff"] },
-  "Audit log store": { cat:"Deployment", what:"An audit log store records every significant action taken in the platform - who deployed what, who changed which configuration, who accessed which secret, who approved which change. Unlike operational logs, audit logs capture human and system actions for compliance, security investigation, and accountability. They must be tamper-evident, retained for defined periods, and queryable for incident investigations.", tradeoffs:["Audit logs must capture enough context to be useful in an investigation. Logging that a user changed a setting is less useful than logging who, what, from what value, to what value, when, and from where.","Audit log storage is append-only and must be protected from modification. The logs themselves are a target in a security incident - an attacker who can modify audit logs can cover their tracks.","Volume grows with system activity. Retention requirements mandated by compliance frameworks mean audit logs accumulate significant storage over time.","Querying audit logs during an incident requires the query tooling to be available independently of the systems being investigated."], oss:["OpenSearch / Elasticsearch","Loki (for audit events)","Infisical audit log","Vault audit log"] },
-  "Circuit breaker library": { cat:"Resilience", what:"A circuit breaker monitors calls to a downstream dependency and automatically stops making calls when failures exceed a threshold, allowing the dependency time to recover. It has three states: closed (calls pass through normally), open (calls are immediately rejected without attempting the dependency), and half-open (a limited number of test calls are allowed to check if the dependency has recovered). It prevents a slow or failing dependency from exhausting the calling service's thread pool or connection limit.", tradeoffs:["Circuit breaker thresholds need tuning per dependency. Thresholds set too sensitive trip on normal transient failures; too permissive and the breaker offers no protection.","When a circuit breaker opens, the calling service must decide what to do - return an error, serve a cached response, or use a fallback. The fallback behaviour needs explicit design.","Circuit breakers are most valuable at the boundary between services you control and dependencies you do not. They are less useful for internal function calls.","Distributed circuit breakers (sharing state across multiple instances of the calling service) require a coordination mechanism. Per-instance breakers are simpler but take longer to respond to widespread failures."], oss:["Resilience4j (JVM)","Polly (.NET)","Hystrix (maintenance)","Built into service meshes (Istio, Linkerd)"] },
-  "Retry middleware": { cat:"Resilience", what:"Retry middleware automatically retries failed requests to a dependency a configured number of times before surfacing the failure to the caller. It handles transient failures - network timeouts, temporary resource exhaustion, brief service unavailability - that would resolve themselves on a subsequent attempt. Combined with exponential backoff and jitter, it absorbs the majority of transient failures without any visible impact to the end user.", tradeoffs:["Retries must only be applied to idempotent operations. Retrying a non-idempotent request without deduplication causes duplicate side effects.","Retries under load amplify the problem. If a service is failing because it is overloaded, every client retrying increases the load further. Circuit breakers and backoff are essential companions to retries.","Maximum retry count and backoff configuration must be set per dependency context. A retry policy suitable for an internal cache miss is different from one for an external payment gateway.","Retry budgets (a limit on the total percentage of requests that can be retried in a time window) prevent retry storms while still allowing per-request retries."], oss:["Resilience4j","Polly","retry (Go stdlib pattern)","urllib3 (Python)","Built into service meshes"] },
-  "Bulkhead / thread pool isolation": { cat:"Resilience", what:"A bulkhead limits the number of concurrent calls to a dependency by allocating a fixed thread pool or semaphore count to each dependency. If calls to one dependency are slow and the pool is exhausted, new calls are immediately rejected rather than queuing indefinitely. This prevents a single slow dependency from consuming all available threads and starving other parts of the system. The name comes from the ship design principle of separating compartments so a breach in one does not sink the whole vessel.", tradeoffs:["Thread pool sizing per dependency requires understanding expected concurrency. Pools sized too small reject legitimate requests; too large and they do not provide effective isolation.","Bulkheads add overhead in environments with high thread pool counts. In very high-concurrency systems, semaphore-based bulkheads may be preferable.","The rejected-request response needs design. The calling service must handle rejections appropriately rather than propagating the error blindly.","Bulkheads are most effective in thread-per-request models. In async/reactive systems, back-pressure mechanisms are the equivalent control."], oss:["Resilience4j (Bulkhead)","Hystrix (thread pool isolation)","Polly (Bulkhead)"] },
-  "Timeout policy engine": { cat:"Resilience", what:"A timeout policy engine enforces maximum allowed durations for calls to external dependencies, ensuring that a hanging call does not block a thread indefinitely. Without timeouts, a dependency that accepts connections but never responds will eventually exhaust all available threads or connections in the calling service. Timeouts bound the worst-case impact of a failing dependency and are the most fundamental resilience mechanism.", tradeoffs:["Setting timeouts correctly is difficult. Too short and legitimate slow requests are incorrectly failed; too long and the protection they offer is reduced.","Timeouts must cascade correctly. If service A calls B with a 10-second timeout, and B calls C with a 10-second timeout, A may wait up to 20 seconds in the worst case. Deadline propagation prevents this.","A timed-out request may still be executing at the dependency. If the operation has a side effect, a timeout does not undo the effect already in progress.","Timeout configuration often lives in multiple places. These must be coordinated - the effective timeout is the minimum of all values in the chain."], oss:["Resilience4j (TimeLimiter)","Polly (Timeout)","context.WithTimeout (Go)","Built into service meshes"] },
-  "Chaos / fault injection framework": { cat:"Resilience", what:"A chaos or fault injection framework deliberately introduces failures into a system - killing processes, introducing latency, severing network connections, filling disks - to verify that resilience mechanisms work as designed and that the system degrades gracefully under failure conditions. Rather than discovering resilience gaps during real incidents, chaos engineering finds them in controlled conditions where you can observe and fix them.", tradeoffs:["Chaos experiments in production require mature observability, robust safety mechanisms to halt experiments, and organisational readiness. Starting in non-production environments is appropriate until confidence is established.","Chaos engineering finds resilience gaps but does not fix them. The value is only realised if the findings drive actual remediation.","Automated chaos requires very high confidence in blast radius controls. Most organisations start with manual, scoped experiments.","The social and cultural aspects of chaos engineering are often harder than the technical implementation."], oss:["Chaos Monkey / Chaos Toolkit","Litmus","Chaosblade","Toxiproxy (network fault injection)"] },
-  "Load shedding proxy": { cat:"Resilience", what:"A load shedding proxy rejects incoming requests when the system is operating above a defined capacity threshold, returning a 503 or 429 response immediately rather than queueing the request indefinitely. It protects the system from cascading failure under overload by ensuring that requests are either served quickly or failed quickly - never queued for so long that they are effectively useless by the time they are processed.", tradeoffs:["Shedding decisions require a real-time view of system load. Latency of the load metric affects how quickly shedding kicks in and how accurately it tracks actual load.","Clients that receive 503 responses need to handle them correctly - backing off rather than immediately retrying. Without client cooperation, load shedding can cause retry storms.","Priority-based shedding requires the request priority to be known at the proxy, which requires protocol support.","Shedding must happen early enough to protect the system but not so eagerly that it rejects requests that could have been served."], oss:["Envoy (adaptive concurrency)","Nginx (limit_conn, limit_req)","Custom middleware in service frameworks"] },
-  "Health check endpoint standard": { cat:"Resilience", what:"A health check endpoint standard defines the contract for how services expose their health status to the platform - a consistent URL path, response schema, and status codes that load balancers, orchestrators, and monitoring tools can query to determine whether an instance is ready to receive traffic. A liveness check indicates whether the process is alive; a readiness check indicates whether it is ready to serve requests.", tradeoffs:["Health checks that are too shallow miss real failure modes. Checks that are too deep add load and can cause cascading failures if the health check itself is slow.","Conflating liveness and readiness causes incorrect behaviour. A service that is alive but not ready (still warming up) should not receive traffic.","Health check polling frequency determines how quickly unhealthy instances are removed from rotation. Frequent polling detects failures faster but adds overhead.","Startup probes (a separate check for slow-starting services) prevent orchestrators from killing services that are still initialising, which is a common source of restart loops."], oss:["Health checks are a convention - implementations use standard HTTP in any framework. Kubernetes defines the liveness/readiness/startup probe spec."] },
-  "Graceful degradation toggle": { cat:"Resilience", what:"A graceful degradation toggle is a mechanism to disable non-essential functionality when the system is under stress, preserving the core user experience at the cost of optional features. For example, disabling personalisation recommendations when the recommendation service is slow, or showing cached prices instead of live prices during a pricing service outage. It allows the system to continue operating in a reduced state rather than failing completely.", tradeoffs:["Degraded behaviour must be explicitly designed for each feature. It cannot be retrofitted easily - the code must know how to operate without the capability it is degrading.","Users experiencing degraded behaviour often do not know the system is degraded, which can cause support load when degraded behaviour is confused with bugs.","Degradation toggles are a form of feature flag and carry the same operational overhead - they need to be monitored, turned off when the underlying issue is resolved, and cleaned up over time.","Degradation that persists too long becomes the new normal. Alerts for sustained degradation ensure it drives remediation rather than being forgotten."], oss:["Unleash (feature flags as degradation toggles)","Flipt","Custom middleware with feature flag integration"] },
-  "Backoff strategy": { cat:"Resilience", what:"A backoff strategy controls how long a client waits before retrying a failed request. Simple fixed-interval backoff can cause retry storms when many clients fail simultaneously and retry at the same moment. Exponential backoff doubles the wait time on each failure, spreading retries out over time. Jitter (randomising the backoff interval) prevents clients from synchronising their retries, which is the main cause of retry storms.", tradeoffs:["Backoff parameters (initial delay, multiplier, maximum delay) need tuning per dependency context. A fast internal cache benefits from aggressive retry; a slow external API needs longer backoff.","Exponential backoff with a long maximum delay means failed requests may not be retried for minutes. The acceptable delay depends on whether the operation is time-sensitive.","Full jitter (random between 0 and the exponential maximum) is most effective at preventing synchronisation but means some retries happen very quickly.","Backoff applies to retries within a single request context. It does not address what to do with requests that are queued waiting to be sent - those need separate flow control."], oss:["Resilience4j","Polly","backoff (Go)","tenacity (Python)","Built into most HTTP client libraries"] }
-};
 
-function showTag(event, name, cat) {
-  event.stopPropagation();
-  const d = S[name]; if (!d) return;
-  document.getElementById('pop-cat').textContent = cat;
-  document.getElementById('pop-title').textContent = name;
-  document.getElementById('pop-what').textContent = d.what;
-  const ul = document.getElementById('pop-tradeoffs');
-  ul.innerHTML = '';
-  d.tradeoffs.forEach(t => { const li = document.createElement('li'); li.textContent = t; ul.appendChild(li); });
-  const pills = document.getElementById('pop-oss');
-  pills.innerHTML = '';
-  d.oss.forEach(o => { const sp = document.createElement('span'); sp.className = 'oss-pill'; sp.textContent = o; pills.appendChild(sp); });
-  document.getElementById('overlay').classList.add('active');
-  document.body.style.overflow = 'hidden';
+<script>
+function toggle(el) {
+  el.classList.toggle('open');
 }
-function closeOverlay() { document.getElementById('overlay').classList.remove('active'); document.body.style.overflow = ''; }
-function closePopover(e) { if (e.target === document.getElementById('overlay')) closeOverlay(); }
-function toggleLayer(event, el) { if (event.target.classList.contains('tag')) return; el.classList.toggle('open'); }
-function toggleRes() { document.getElementById('res-band').classList.toggle('open'); }
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeOverlay(); });
+function toggleR(el) {
+  el.classList.toggle('open');
+  el.querySelector('.r-detail').style.display =
+    el.classList.contains('open') ? 'block' : 'none';
+}
 </script>
 </body>
 </html>
