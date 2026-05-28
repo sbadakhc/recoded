@@ -60,6 +60,63 @@
     cursor: pointer; transition: opacity 0.12s, transform 0.12s; user-select: none;
   }
   .tag:hover { opacity: 0.72; transform: translateY(-1px); }
+  .tag.preferred-tag { font-weight: 600; }
+  .tag.preferred-tag::before { content: '★ '; font-size: 0.62rem; opacity: 0.75; }
+  .tag.dimmed { opacity: 0.2; transform: none; }
+  .tag.highlighted { box-shadow: 0 0 0 2px rgba(0,0,0,0.25); transform: translateY(-1px); }
+
+  /* Search bar */
+  .search-wrap {
+    margin-bottom: 1.25rem; position: relative;
+  }
+  .search-input {
+    width: 100%; padding: 0.65rem 1rem 0.65rem 2.5rem;
+    font-family: 'Source Serif 4', Georgia, serif; font-size: 0.95rem;
+    border: 1.5px solid #d3d1c7; border-radius: 10px;
+    background: #ffffff; color: #2c2825;
+    outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .search-input:focus { border-color: #7F77DD; box-shadow: 0 0 0 3px rgba(127,119,221,0.15); }
+  .search-input::placeholder { color: #b0aca6; }
+  .search-icon {
+    position: absolute; left: 0.8rem; top: 50%; transform: translateY(-50%);
+    color: #b0aca6; font-size: 1rem; pointer-events: none;
+  }
+  .search-clear {
+    position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%);
+    background: none; border: none; color: #b0aca6; cursor: pointer;
+    font-size: 1rem; display: none; padding: 0.1rem 0.3rem;
+  }
+  .search-clear.visible { display: block; }
+  .search-meta {
+    text-align: center; font-size: 0.8rem; color: #9a9590;
+    margin-top: -0.75rem; margin-bottom: 1rem; min-height: 1.2rem;
+    font-style: italic;
+  }
+  /* Legend */
+  .legend {
+    display: flex; align-items: center; justify-content: center;
+    gap: 1.25rem; margin-bottom: 1.25rem; flex-wrap: wrap;
+  }
+  .legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: #7a756f; }
+  .legend-pill {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
+    padding: 0.15rem 0.5rem; border-radius: 4px; border: 1px solid;
+  }
+  .legend-pill.pref { background: #1a1a2e; color: #fff; border-color: #1a1a2e; font-weight: 600; }
+  .legend-pill.pref::before { content: '★ '; font-size: 0.6rem; opacity: 0.8; }
+  .legend-pill.alt { background: #f1efe8; color: #444441; border-color: #d3d1c7; }
+  .legend-tag-pref {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
+    padding: 0.15rem 0.5rem; border-radius: 4px; border: 1px solid #5DCAA5;
+    background: #b8ead7; color: #085041; font-weight: 600;
+  }
+  .legend-tag-pref::before { content: '★ '; font-size: 0.6rem; opacity: 0.75; }
+  .legend-tag-std {
+    font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
+    padding: 0.15rem 0.5rem; border-radius: 4px; border: 1px solid #5DCAA5;
+    background: #b8ead7; color: #085041;
+  }
   .detail {
     display: none; margin-top: 1.1rem; padding-top: 1.1rem; border-top: 1px solid rgba(0,0,0,0.1);
   }
@@ -202,7 +259,18 @@
     <h1>RECODED</h1>
     <p>A DevEx platform engineering reference model</p>
   </div>
-  <p class="hint">Click a layer to expand it &mdash; click any solution tag for a full explanation</p>
+  <div class="legend">
+    <div class="legend-item"><span class="legend-tag-pref">tag</span> Organisation preferred</div>
+    <div class="legend-item"><span class="legend-tag-std">tag</span> Solution type</div>
+    <div class="legend-item"><span class="legend-pill pref">pill</span> Preferred OSS</div>
+    <div class="legend-item"><span class="legend-pill alt">pill</span> Alternative OSS</div>
+  </div>
+  <div class="search-wrap">
+    <span class="search-icon">&#9906;</span>
+    <input class="search-input" id="search-input" type="text" placeholder="Search solutions, tools, or layers&hellip;" oninput="handleSearch(this.value)">
+    <button class="search-clear" id="search-clear" onclick="clearSearch()">&#x2715;</button>
+  </div>
+  <div class="search-meta" id="search-meta"></div>
 
   <div class="resilience-frame">
     <span class="resilience-label">R &mdash; Resilience patterns (cross-cutting)</span>
@@ -217,14 +285,14 @@
           <div class="layer-name">Edge &amp; traffic control <span class="open-indicator">&#9660;</span></div>
           <div class="layer-desc">The front door - only valid, within-policy traffic gets through</div>
           <div class="tags">
-            <span class="tag" onclick="showTag(event,'API gateway','Edge &amp; traffic control')">API gateway</span>
+            <span class="tag preferred-tag" onclick="showTag(event,'API gateway','Edge &amp; traffic control')">API gateway</span>
             <span class="tag" onclick="showTag(event,'Web application firewall','Edge &amp; traffic control')">Web application firewall</span>
             <span class="tag" onclick="showTag(event,'DDoS protection','Edge &amp; traffic control')">DDoS protection</span>
             <span class="tag" onclick="showTag(event,'TLS termination proxy','Edge &amp; traffic control')">TLS termination proxy</span>
             <span class="tag" onclick="showTag(event,'CDN','Edge &amp; traffic control')">CDN</span>
             <span class="tag" onclick="showTag(event,'Rate limiter','Edge &amp; traffic control')">Rate limiter</span>
             <span class="tag" onclick="showTag(event,'DNS load balancer','Edge &amp; traffic control')">DNS load balancer</span>
-            <span class="tag" onclick="showTag(event,'Ingress controller','Edge &amp; traffic control')">Ingress controller</span>
+            <span class="tag preferred-tag" onclick="showTag(event,'Ingress controller','Edge &amp; traffic control')">Ingress controller</span>
             <span class="tag" onclick="showTag(event,'Bot detection','Edge &amp; traffic control')">Bot detection</span>
           </div>
           <div class="detail">
@@ -248,14 +316,14 @@
           <div class="layer-name">Compute &amp; service architecture <span class="open-indicator">&#9660;</span></div>
           <div class="layer-desc">Where code runs - replaceable services, controlled communication</div>
           <div class="tags">
-            <span class="tag" onclick="showTag(event,'Container runtime','Compute &amp; service architecture')">Container runtime</span>
-            <span class="tag" onclick="showTag(event,'Container orchestrator','Compute &amp; service architecture')">Container orchestrator</span>
-            <span class="tag" onclick="showTag(event,'Service mesh','Compute &amp; service architecture')">Service mesh</span>
+            <span class="tag preferred-tag" onclick="showTag(event,'Container runtime','Compute &amp; service architecture')">Container runtime</span>
+            <span class="tag preferred-tag" onclick="showTag(event,'Container orchestrator','Compute &amp; service architecture')">Container orchestrator</span>
+            <span class="tag preferred-tag" onclick="showTag(event,'Service mesh','Compute &amp; service architecture')">Service mesh</span>
             <span class="tag" onclick="showTag(event,'Internal load balancer','Compute &amp; service architecture')">Internal load balancer</span>
-            <span class="tag" onclick="showTag(event,'Sidecar proxy','Compute &amp; service architecture')">Sidecar proxy</span>
-            <span class="tag" onclick="showTag(event,'Service discovery registry','Compute &amp; service architecture')">Service discovery registry</span>
-            <span class="tag" onclick="showTag(event,'Deployment pipeline','Compute &amp; service architecture')">Deployment pipeline</span>
-            <span class="tag" onclick="showTag(event,'Internal developer portal','Compute &amp; service architecture')">Internal developer portal</span>
+            <span class="tag preferred-tag" onclick="showTag(event,'Sidecar proxy','Compute &amp; service architecture')">Sidecar proxy</span>
+            <span class="tag preferred-tag" onclick="showTag(event,'Service discovery registry','Compute &amp; service architecture')">Service discovery registry</span>
+            <span class="tag preferred-tag" onclick="showTag(event,'Deployment pipeline','Compute &amp; service architecture')">Deployment pipeline</span>
+            <span class="tag preferred-tag" onclick="showTag(event,'Internal developer portal','Compute &amp; service architecture')">Internal developer portal</span>
             <span class="tag" onclick="showTag(event,'Local dev environment tool','Compute &amp; service architecture')">Local dev environment tool</span>
             <span class="tag" onclick="showTag(event,'Service template / scaffold','Compute &amp; service architecture')">Service template / scaffold</span>
           </div>
@@ -280,15 +348,15 @@
           <div class="layer-name">Observability &amp; diagnostics <span class="open-indicator">&#9660;</span></div>
           <div class="layer-desc">If you can't see it, you can't fix it - every request leaves a trace</div>
           <div class="tags">
-            <span class="tag" onclick="showTag(event,'Structured log aggregator','Observability &amp; diagnostics')">Structured log aggregator</span>
-            <span class="tag" onclick="showTag(event,'Metrics collection agent','Observability &amp; diagnostics')">Metrics collection agent</span>
-            <span class="tag" onclick="showTag(event,'Time-series database','Observability &amp; diagnostics')">Time-series database</span>
-            <span class="tag" onclick="showTag(event,'Distributed tracing system','Observability &amp; diagnostics')">Distributed tracing system</span>
-            <span class="tag" onclick="showTag(event,'Alerting engine','Observability &amp; diagnostics')">Alerting engine</span>
-            <span class="tag" onclick="showTag(event,'Dashboarding platform','Observability &amp; diagnostics')">Dashboarding platform</span>
+            <span class="tag preferred-tag" onclick="showTag(event,'Structured log aggregator','Observability &amp; diagnostics')">Structured log aggregator</span>
+            <span class="tag preferred-tag" onclick="showTag(event,'Metrics collection agent','Observability &amp; diagnostics')">Metrics collection agent</span>
+            <span class="tag preferred-tag" onclick="showTag(event,'Time-series database','Observability &amp; diagnostics')">Time-series database</span>
+            <span class="tag preferred-tag" onclick="showTag(event,'Distributed tracing system','Observability &amp; diagnostics')">Distributed tracing system</span>
+            <span class="tag preferred-tag" onclick="showTag(event,'Alerting engine','Observability &amp; diagnostics')">Alerting engine</span>
+            <span class="tag preferred-tag" onclick="showTag(event,'Dashboarding platform','Observability &amp; diagnostics')">Dashboarding platform</span>
             <span class="tag" onclick="showTag(event,'On-call routing tool','Observability &amp; diagnostics')">On-call routing tool</span>
             <span class="tag" onclick="showTag(event,'Error tracking service','Observability &amp; diagnostics')">Error tracking service</span>
-            <span class="tag" onclick="showTag(event,'Telemetry SDK','Observability &amp; diagnostics')">Telemetry SDK</span>
+            <span class="tag preferred-tag" onclick="showTag(event,'Telemetry SDK','Observability &amp; diagnostics')">Telemetry SDK</span>
           </div>
           <div class="detail">
             <div class="detail-grid">
@@ -374,12 +442,12 @@
           <div class="layer-name">Deployment - control plane &amp; configuration <span class="open-indicator">&#9660;</span></div>
           <div class="layer-desc">Intent becomes reality - configuration is code, and drift is a bug</div>
           <div class="tags">
-            <span class="tag" onclick="showTag(event,'GitOps controller','Deployment')">GitOps controller</span>
-            <span class="tag" onclick="showTag(event,'Infrastructure-as-code tool','Deployment')">Infrastructure-as-code tool</span>
-            <span class="tag" onclick="showTag(event,'Secret management system','Deployment')">Secret management system</span>
+            <span class="tag preferred-tag" onclick="showTag(event,'GitOps controller','Deployment')">GitOps controller</span>
+            <span class="tag preferred-tag" onclick="showTag(event,'Infrastructure-as-code tool','Deployment')">Infrastructure-as-code tool</span>
+            <span class="tag preferred-tag" onclick="showTag(event,'Secret management system','Deployment')">Secret management system</span>
             <span class="tag" onclick="showTag(event,'Configuration store','Deployment')">Configuration store</span>
             <span class="tag" onclick="showTag(event,'Feature flag service','Deployment')">Feature flag service</span>
-            <span class="tag" onclick="showTag(event,'Policy engine','Deployment')">Policy engine</span>
+            <span class="tag preferred-tag" onclick="showTag(event,'Policy engine','Deployment')">Policy engine</span>
             <span class="tag" onclick="showTag(event,'Drift detection tool','Deployment')">Drift detection tool</span>
             <span class="tag" onclick="showTag(event,'Change preview / dry-run','Deployment')">Change preview / dry-run</span>
             <span class="tag" onclick="showTag(event,'Audit log store','Deployment')">Audit log store</span>
@@ -536,6 +604,66 @@ function showTag(event, name, cat) {
   document.body.style.overflow = 'hidden';
 }
 function closeOverlay() { document.getElementById('overlay').classList.remove('active'); document.body.style.overflow = ''; }
+
+function handleSearch(val) {
+  const q = val.trim().toLowerCase();
+  const clearBtn = document.getElementById('search-clear');
+  const meta = document.getElementById('search-meta');
+  clearBtn.classList.toggle('visible', q.length > 0);
+
+  const allTags = document.querySelectorAll('.tag');
+  const allLayers = document.querySelectorAll('.layer');
+  const resBand = document.getElementById('res-band');
+
+  if (!q) {
+    allTags.forEach(t => { t.classList.remove('dimmed', 'highlighted'); });
+    allLayers.forEach(l => l.classList.remove('open'));
+    resBand.classList.remove('open');
+    meta.textContent = '';
+    return;
+  }
+
+  let matchCount = 0;
+  const layersWithMatches = new Set();
+
+  allTags.forEach(tag => {
+    const tagText = tag.textContent.toLowerCase();
+    const solutionName = tag.getAttribute('onclick').match(/'([^']+)'/)?.[1] || '';
+    const solData = S[solutionName];
+    const searchableText = [
+      tagText,
+      solutionName.toLowerCase(),
+      solData ? solData.what.toLowerCase() : '',
+      solData ? (solData.preferred || []).map(p => typeof p === 'object' ? p.name : p).join(' ').toLowerCase() : '',
+      solData ? (solData.oss || []).map(p => typeof p === 'object' ? p.name : p).join(' ').toLowerCase() : '',
+    ].join(' ');
+
+    const matches = searchableText.includes(q);
+    tag.classList.toggle('dimmed', !matches);
+    tag.classList.toggle('highlighted', matches);
+    if (matches) {
+      matchCount++;
+      const layer = tag.closest('.layer');
+      if (layer) { layer.classList.add('open'); layersWithMatches.add(layer); }
+      const rBand = tag.closest('.resilience-band');
+      if (rBand) { rBand.classList.add('open'); }
+    }
+  });
+
+  // Close layers with no matches
+  allLayers.forEach(l => { if (!layersWithMatches.has(l)) l.classList.remove('open'); });
+
+  meta.textContent = matchCount === 0
+    ? 'No matches found'
+    : matchCount === 1 ? '1 match' : matchCount + ' matches';
+}
+
+function clearSearch() {
+  const input = document.getElementById('search-input');
+  input.value = '';
+  handleSearch('');
+  input.focus();
+}
 function closePopover(e) { if (e.target === document.getElementById('overlay')) closeOverlay(); }
 function toggleLayer(event, el) { if (event.target.classList.contains('tag')) return; el.classList.toggle('open'); }
 function toggleRes() { document.getElementById('res-band').classList.toggle('open'); }
