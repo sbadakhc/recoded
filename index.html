@@ -3,242 +3,590 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RECODED - Platform Engineering Layers</title>
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,300;8..60,400;8..60,600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<title>RECODED — Platform Engineering Reference</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: #f7f5f2; min-height: 100vh;
-    display: flex; align-items: flex-start; justify-content: center;
-    padding: 3rem 2rem 5rem;
-    font-family: 'Source Serif 4', Georgia, serif;
-  }
-  .page { width: 100%; max-width: 960px; }
-  .doc-title { text-align: center; margin-bottom: 2.5rem; }
-  .doc-title h1 {
-    font-family: 'JetBrains Mono', monospace; font-size: 2.8rem;
-    font-weight: 600; letter-spacing: 0.12em; color: #2c2825; margin-bottom: 0.4rem;
-  }
-  .doc-title p { font-size: 1rem; color: #7a756f; font-style: italic; }
-  .hint { text-align: center; font-size: 0.85rem; color: #9a9590; margin-bottom: 1.5rem; font-style: italic; }
-  .resilience-frame {
-    border: 2px dashed #7F77DD; border-radius: 20px;
-    padding: 2rem 1.5rem 1.5rem; position: relative;
-  }
-  .resilience-label {
-    position: absolute; top: -14px; left: 24px;
-    background: #EEEDFE; border: 1px solid #AFA9EC; border-radius: 8px;
-    padding: 0.2rem 0.75rem; font-family: 'JetBrains Mono', monospace;
-    font-size: 0.75rem; font-weight: 600; color: #3C3489; letter-spacing: 0.04em;
-  }
-  .resilience-label-bottom {
-    position: absolute; bottom: -14px; right: 24px;
-    background: #EEEDFE; border: 1px solid #AFA9EC; border-radius: 8px;
-    padding: 0.2rem 0.75rem; font-family: 'JetBrains Mono', monospace;
-    font-size: 0.75rem; font-weight: 600; color: #3C3489; letter-spacing: 0.04em;
-  }
-  .layers { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px; }
-  .layer {
-    border-radius: 14px; padding: 1.4rem 1.5rem 1.2rem; cursor: pointer;
-    transition: opacity 0.15s, box-shadow 0.15s;
-    display: flex; gap: 1.25rem; align-items: flex-start; border: 2px solid transparent;
-  }
-  .layer:hover { opacity: 0.92; box-shadow: 0 2px 12px rgba(0,0,0,0.07); }
-  .layer.open { border-color: rgba(0,0,0,0.1); }
-  .layer-letter {
-    font-family: 'JetBrains Mono', monospace; font-size: 3.2rem;
-    font-weight: 600; line-height: 1; flex-shrink: 0; width: 52px; text-align: center; margin-top: 2px;
-  }
-  .layer-divider { width: 1px; align-self: stretch; opacity: 0.3; flex-shrink: 0; }
-  .layer-content { flex: 1; min-width: 0; }
-  .layer-name { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.25rem; }
-  .layer-desc { font-size: 0.9rem; margin-bottom: 0.75rem; opacity: 0.8; font-style: italic; line-height: 1.5; }
-  .tags { display: flex; flex-wrap: wrap; gap: 0.4rem; }
-  .tag {
-    font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;
-    padding: 0.2rem 0.55rem; border-radius: 5px; border: 1px solid; line-height: 1.6;
-    cursor: pointer; transition: opacity 0.12s, transform 0.12s; user-select: none;
-  }
-  .tag:hover { opacity: 0.72; transform: translateY(-1px); }
-  .tag.preferred-tag { font-weight: 600; }
-  .tag.preferred-tag::before { content: '★ '; font-size: 0.62rem; opacity: 0.75; }
-  .tag.dimmed { opacity: 0.2; transform: none; }
-  .tag.highlighted { box-shadow: 0 0 0 2px rgba(0,0,0,0.25); transform: translateY(-1px); }
+/* ── Linear Design Tokens ─────────────────────────────────────── */
+:root {
+  --pitch-black:   #08090a;
+  --graphite:      #0f1011;
+  --deep-slate:    #161718;
+  --charcoal:      #23252a;
+  --muted-ash:     #323334;
+  --gunmetal:      #383b3f;
+  --fog-grey:      #62666d;
+  --storm-cloud:   #8a8f98;
+  --light-steel:   #d0d6e0;
+  --alabaster:     #e5e5e6;
+  --porcelain:     #f7f8f8;
+  --neon-lime:     #e4f222;
+  --aether-blue:   #5e6ad2;
+  --cyan-spark:    #02b8cc;
+  --deep-violet:   #6366f1;
+  --amethyst:      #8b5cf6;
+  --forest-green:  #008d2c;
+  --warning-red:   #eb5757;
 
-  /* Search bar */
-  .search-wrap {
-    margin-bottom: 1.25rem; position: relative;
-  }
-  .search-input {
-    width: 100%; padding: 0.65rem 1rem 0.65rem 2.5rem;
-    font-family: 'Source Serif 4', Georgia, serif; font-size: 0.95rem;
-    border: 1.5px solid #d3d1c7; border-radius: 10px;
-    background: #ffffff; color: #2c2825;
-    outline: none; transition: border-color 0.15s, box-shadow 0.15s;
-  }
-  .search-input:focus { border-color: #7F77DD; box-shadow: 0 0 0 3px rgba(127,119,221,0.15); }
-  .search-input::placeholder { color: #b0aca6; }
-  .search-icon {
-    position: absolute; left: 0.8rem; top: 50%; transform: translateY(-50%);
-    color: #b0aca6; font-size: 1rem; pointer-events: none;
-  }
-  .search-clear {
-    position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%);
-    background: none; border: none; color: #b0aca6; cursor: pointer;
-    font-size: 1rem; display: none; padding: 0.1rem 0.3rem;
-  }
-  .search-clear.visible { display: block; }
-  .search-meta {
-    text-align: center; font-size: 0.8rem; color: #9a9590;
-    margin-top: -0.75rem; margin-bottom: 1rem; min-height: 1.2rem;
-    font-style: italic;
-  }
-  /* Legend */
-  .legend {
-    display: flex; align-items: center; justify-content: center;
-    gap: 1.25rem; margin-bottom: 1.25rem; flex-wrap: wrap;
-  }
-  .legend-item { display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: #7a756f; }
-  .legend-pill {
-    font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
-    padding: 0.15rem 0.5rem; border-radius: 4px; border: 1px solid;
-  }
-  .legend-pill.pref { background: #1a1a2e; color: #fff; border-color: #1a1a2e; font-weight: 600; }
-  .legend-pill.pref::before { content: '★ '; font-size: 0.6rem; opacity: 0.8; }
-  .legend-pill.alt { background: #f1efe8; color: #444441; border-color: #d3d1c7; }
-  .legend-tag-pref {
-    font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
-    padding: 0.15rem 0.5rem; border-radius: 4px; border: 1px solid #5DCAA5;
-    background: #b8ead7; color: #085041; font-weight: 600;
-  }
-  .legend-tag-pref::before { content: '★ '; font-size: 0.6rem; opacity: 0.75; }
-  .legend-tag-std {
-    font-family: 'JetBrains Mono', monospace; font-size: 0.68rem;
-    padding: 0.15rem 0.5rem; border-radius: 4px; border: 1px solid #5DCAA5;
-    background: #b8ead7; color: #085041;
-  }
-  .detail {
-    display: none; margin-top: 1.1rem; padding-top: 1.1rem; border-top: 1px solid rgba(0,0,0,0.1);
-  }
-  .layer.open .detail { display: block; }
-  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 0.85rem; }
-  .detail-cell .dc-label {
-    font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 600;
-    letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.55; margin-bottom: 0.3rem;
-  }
-  .detail-cell p { font-size: 0.88rem; line-height: 1.65; opacity: 0.85; }
-  .invariant-row {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
-    margin-top: 0.85rem; padding-top: 0.85rem; border-top: 1px solid rgba(0,0,0,0.07);
-  }
-  .inv-block .inv-label {
-    font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 600;
-    letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.55; margin-bottom: 0.3rem;
-  }
-  .inv-block p { font-size: 0.85rem; font-style: italic; line-height: 1.6; opacity: 0.8; }
-  .open-indicator {
-    font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; opacity: 0.4;
-    float: right; margin-top: 4px; transition: transform 0.2s; display: inline-block;
-  }
-  .layer.open .open-indicator { transform: rotate(180deg); }
-  /* Overlay */
-  .overlay {
-    display: none; position: fixed; inset: 0;
-    background: rgba(0,0,0,0.38); z-index: 100;
-    align-items: center; justify-content: center; padding: 2rem;
-  }
-  .overlay.active { display: flex; }
-  .popover {
-    background: #ffffff; border-radius: 16px; max-width: 580px; width: 100%;
-    max-height: 82vh; overflow-y: auto; padding: 2rem;
-    box-shadow: 0 8px 40px rgba(0,0,0,0.2); position: relative;
-  }
-  .popover-close {
-    position: absolute; top: 1rem; right: 1rem;
-    background: #f1efe8; border: none; border-radius: 50%;
-    width: 28px; height: 28px; cursor: pointer; font-size: 1rem; color: #5f5e5a;
-    display: flex; align-items: center; justify-content: center; transition: background 0.15s;
-  }
-  .popover-close:hover { background: #e4e0d9; }
-  .popover-category { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: #888780; margin-bottom: 0.4rem; }
-  .popover h2 { font-size: 1.3rem; font-weight: 600; color: #2c2825; margin-bottom: 1.1rem; line-height: 1.3; }
-  .pop-section { margin-bottom: 1.1rem; }
-  .pop-label { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: #888780; margin-bottom: 0.35rem; }
-  .pop-section p { font-size: 0.93rem; line-height: 1.72; color: #3d3a36; }
-  .pop-section ul { padding-left: 1.2rem; }
-  .pop-section ul li { font-size: 0.91rem; line-height: 1.65; color: #3d3a36; margin-bottom: 0.3rem; }
-  .oss-pills { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem; }
-  .oss-pill {
-    font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;
-    background: #f1efe8; border: 1px solid #d3d1c7;
-    border-radius: 5px; padding: 0.2rem 0.6rem; color: #444441;
-  }
-  .oss-pill-preferred {
-    font-family: 'JetBrains Mono', monospace; font-size: 0.72rem;
-    background: #1a1a2e; border: 1px solid #1a1a2e;
-    border-radius: 5px; padding: 0.2rem 0.6rem; color: #ffffff;
-    font-weight: 600; text-decoration: none; display: inline-block;
-    transition: background 0.15s, transform 0.12s;
-  }
-  .oss-pill-preferred:hover { background: #2d2d4e; transform: translateY(-1px); }
-  .oss-pill-preferred::before { content: '★ '; font-size: 0.65rem; opacity: 0.8; }
-  a.oss-pill {
-    text-decoration: none; display: inline-block;
-    transition: background 0.15s, transform 0.12s;
-  }
-  a.oss-pill:hover { background: #e4e0d9; transform: translateY(-1px); }
-  .pop-oss-section { margin-bottom: 0.6rem; }
-  .pop-oss-label { font-family: 'JetBrains Mono', monospace; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: #b0aca6; margin-bottom: 0.3rem; margin-top: 0.5rem; }
-  /* Layer colours */
-  .l-teal { background: #E1F5EE; }
-  .l-teal .layer-letter, .l-teal .layer-name { color: #085041; }
-  .l-teal .layer-desc { color: #0F6E56; }
-  .l-teal .layer-divider { background: #1D9E75; }
-  .l-teal .tag { background: #b8ead7; border-color: #5DCAA5; color: #085041; }
-  .l-blue { background: #E6F1FB; }
-  .l-blue .layer-letter, .l-blue .layer-name { color: #0C447C; }
-  .l-blue .layer-desc { color: #185FA5; }
-  .l-blue .layer-divider { background: #378ADD; }
-  .l-blue .tag { background: #c4ddf5; border-color: #85B7EB; color: #0C447C; }
-  .l-amber { background: #FAEEDA; }
-  .l-amber .layer-letter, .l-amber .layer-name { color: #633806; }
-  .l-amber .layer-desc { color: #854F0B; }
-  .l-amber .layer-divider { background: #BA7517; }
-  .l-amber .tag { background: #f7d89a; border-color: #EF9F27; color: #633806; }
-  .l-green { background: #EAF3DE; }
-  .l-green .layer-letter, .l-green .layer-name { color: #27500A; }
-  .l-green .layer-desc { color: #3B6D11; }
-  .l-green .layer-divider { background: #639922; }
-  .l-green .tag { background: #cce4a0; border-color: #97C459; color: #27500A; }
-  .l-coral { background: #FAECE7; }
-  .l-coral .layer-letter, .l-coral .layer-name { color: #712B13; }
-  .l-coral .layer-desc { color: #993C1D; }
-  .l-coral .layer-divider { background: #D85A30; }
-  .l-coral .tag { background: #f5c4b0; border-color: #F0997B; color: #712B13; }
-  .l-gray { background: #F1EFE8; }
-  .l-gray .layer-letter, .l-gray .layer-name { color: #2C2C2A; }
-  .l-gray .layer-desc { color: #5F5E5A; }
-  .l-gray .layer-divider { background: #888780; }
-  .l-gray .tag { background: #dddbd3; border-color: #B4B2A9; color: #2C2C2A; }
-  .resilience-band {
-    background: #EEEDFE; border: 1px solid #AFA9EC;
-    border-radius: 14px; padding: 1.25rem 1.5rem 1.4rem; margin-top: 10px;
-  }
-  .r-header { cursor: pointer; }
-  .r-label { font-size: 0.8rem; font-style: italic; color: #534AB7; margin-bottom: 0.75rem; text-align: center; }
-  .resilience-band .tags { justify-content: center; margin-bottom: 0.6rem; }
-  .resilience-band .tag { background: #d8d6f8; border-color: #AFA9EC; color: #3C3489; }
-  .r-detail { display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #AFA9EC; }
-  .resilience-band.open .r-detail { display: block; }
-  .invariants { display: flex; flex-direction: column; gap: 0.35rem; margin-top: 0.85rem; }
-  .invariant { font-size: 0.82rem; color: #534AB7; font-style: italic; text-align: center; line-height: 1.5; }
-  .invariant strong { font-style: normal; font-weight: 600; }
-  @media (max-width: 640px) {
-    .layer-letter { font-size: 2.2rem; width: 40px; }
-    .doc-title h1 { font-size: 2rem; }
-    .detail-grid, .invariant-row { grid-template-columns: 1fr; }
-    .popover { padding: 1.5rem; }
-  }
+  --shadow-sm:     rgba(0,0,0,0.4) 0px 2px 4px 0px;
+  --shadow-subtle: rgb(35,37,42) 0px 0px 0px 1px inset;
+  --shadow-xl:     rgba(8,9,10,0.6) 0px 4px 32px 0px;
+
+  --radius-tag:    2px;
+  --radius-badge:  4px;
+  --radius-card:   6px;
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* ── Reset ────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--pitch-black);
+  color: var(--porcelain);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  letter-spacing: -0.13px;
+  min-height: 100vh;
+}
+
+/* ── Layout ───────────────────────────────────────────────────── */
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 48px 24px 80px;
+}
+
+/* ── Header ───────────────────────────────────────────────────── */
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--charcoal);
+}
+.header-eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--storm-cloud);
+  margin-bottom: 12px;
+}
+.header h1 {
+  font-family: var(--font-mono);
+  font-size: 48px;
+  font-weight: 600;
+  letter-spacing: -0.22px;
+  color: var(--porcelain);
+  line-height: 1.1;
+  margin-bottom: 8px;
+}
+.header-sub {
+  font-size: 15px;
+  color: var(--storm-cloud);
+  letter-spacing: -0.11px;
+}
+
+/* ── Legend ───────────────────────────────────────────────────── */
+.legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--storm-cloud);
+  letter-spacing: -0.1px;
+}
+.lbadge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: var(--radius-badge);
+  border: 1px solid var(--charcoal);
+  background: var(--graphite);
+  color: var(--light-steel);
+}
+.lbadge.preferred {
+  background: var(--neon-lime);
+  border-color: var(--neon-lime);
+  color: var(--pitch-black);
+  font-weight: 600;
+}
+.lbadge.preferred::before { content: '★ '; font-size: 9px; }
+.lbadge.tag-pref {
+  background: rgba(94,106,210,0.15);
+  border-color: var(--aether-blue);
+  color: var(--aether-blue);
+  font-weight: 600;
+}
+.lbadge.tag-pref::before { content: '★ '; font-size: 9px; }
+.lbadge.tag-std {
+  background: rgba(94,106,210,0.08);
+  border-color: var(--charcoal);
+  color: var(--light-steel);
+}
+
+/* ── Search ───────────────────────────────────────────────────── */
+.search-wrap {
+  position: relative;
+  margin-bottom: 8px;
+}
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--fog-grey);
+  font-size: 13px;
+  pointer-events: none;
+}
+.search-input {
+  width: 100%;
+  padding: 10px 36px 10px 36px;
+  background: var(--graphite);
+  border: 1px solid var(--charcoal);
+  border-radius: var(--radius-card);
+  color: var(--porcelain);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  letter-spacing: -0.13px;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  box-shadow: var(--shadow-subtle);
+}
+.search-input::placeholder { color: var(--fog-grey); }
+.search-input:focus {
+  border-color: var(--aether-blue);
+  box-shadow: 0 0 0 2px rgba(94,106,210,0.2);
+}
+.search-clear {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--fog-grey);
+  cursor: pointer;
+  font-size: 13px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  display: none;
+  transition: color 0.15s;
+}
+.search-clear:hover { color: var(--light-steel); }
+.search-clear.visible { display: block; }
+.search-meta {
+  text-align: center;
+  font-size: 12px;
+  color: var(--fog-grey);
+  min-height: 20px;
+  margin-bottom: 16px;
+  letter-spacing: -0.1px;
+}
+
+/* ── Resilience frame ─────────────────────────────────────────── */
+.resilience-frame {
+  border: 1px solid var(--muted-ash);
+  border-radius: 10px;
+  padding: 24px 16px 16px;
+  position: relative;
+}
+.resilience-label {
+  position: absolute; top: -11px; left: 20px;
+  background: var(--pitch-black);
+  padding: 0 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--storm-cloud);
+}
+.resilience-label-bottom {
+  position: absolute; bottom: -11px; right: 20px;
+  background: var(--pitch-black);
+  padding: 0 8px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--storm-cloud);
+}
+
+/* ── Layers ───────────────────────────────────────────────────── */
+.layers { display: flex; flex-direction: column; gap: 4px; margin-bottom: 4px; }
+
+.layer {
+  background: var(--graphite);
+  border: 1px solid var(--charcoal);
+  border-radius: var(--radius-card);
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  box-shadow: var(--shadow-subtle);
+}
+.layer:hover { border-color: var(--muted-ash); background: var(--deep-slate); }
+.layer.open { border-color: var(--gunmetal); background: var(--deep-slate); }
+
+.layer-letter {
+  font-family: var(--font-mono);
+  font-size: 28px;
+  font-weight: 600;
+  line-height: 1;
+  flex-shrink: 0;
+  width: 36px;
+  text-align: center;
+  margin-top: 1px;
+  color: var(--storm-cloud);
+}
+.layer.open .layer-letter { color: var(--porcelain); }
+
+.layer-divider {
+  width: 1px;
+  align-self: stretch;
+  background: var(--charcoal);
+  flex-shrink: 0;
+}
+
+.layer-content { flex: 1; min-width: 0; }
+
+.layer-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--light-steel);
+  margin-bottom: 3px;
+  letter-spacing: -0.12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.layer.open .layer-name { color: var(--porcelain); }
+
+.layer-desc {
+  font-size: 12px;
+  color: var(--fog-grey);
+  margin-bottom: 10px;
+  letter-spacing: -0.1px;
+  line-height: 1.5;
+}
+
+.open-indicator {
+  font-size: 10px;
+  color: var(--fog-grey);
+  transition: transform 0.2s;
+  display: inline-block;
+  margin-left: 6px;
+}
+.layer.open .open-indicator { transform: rotate(180deg); }
+
+/* ── Tags ─────────────────────────────────────────────────────── */
+.tags { display: flex; flex-wrap: wrap; gap: 4px; }
+
+.tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: var(--radius-tag);
+  border: 1px solid var(--charcoal);
+  background: var(--gunmetal);
+  color: var(--storm-cloud);
+  cursor: pointer;
+  transition: border-color 0.12s, color 0.12s, background 0.12s, transform 0.1s;
+  user-select: none;
+  letter-spacing: -0.08px;
+}
+.tag:hover {
+  border-color: var(--muted-ash);
+  color: var(--light-steel);
+  transform: translateY(-1px);
+}
+.tag.preferred-tag {
+  border-color: rgba(94,106,210,0.5);
+  background: rgba(94,106,210,0.1);
+  color: var(--aether-blue);
+  font-weight: 600;
+}
+.tag.preferred-tag::before { content: '★ '; font-size: 9px; opacity: 0.8; }
+.tag.preferred-tag:hover {
+  border-color: var(--aether-blue);
+  background: rgba(94,106,210,0.18);
+  color: var(--porcelain);
+}
+.tag.dimmed { opacity: 0.15; transform: none; }
+.tag.highlighted {
+  border-color: var(--neon-lime) !important;
+  color: var(--neon-lime) !important;
+  background: rgba(228,242,34,0.08) !important;
+  transform: translateY(-1px);
+}
+
+/* ── Detail panel ─────────────────────────────────────────────── */
+.detail {
+  display: none;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--charcoal);
+}
+.layer.open .detail { display: block; }
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.dc-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fog-grey);
+  margin-bottom: 4px;
+}
+.detail-cell p {
+  font-size: 12px;
+  line-height: 1.65;
+  color: var(--storm-cloud);
+}
+.invariant-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--charcoal);
+}
+.inv-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fog-grey);
+  margin-bottom: 4px;
+}
+.inv-block p {
+  font-size: 12px;
+  font-style: italic;
+  line-height: 1.6;
+  color: var(--storm-cloud);
+}
+
+/* ── Resilience band ──────────────────────────────────────────── */
+.resilience-band {
+  background: var(--graphite);
+  border: 1px solid var(--charcoal);
+  border-radius: var(--radius-card);
+  padding: 12px 14px;
+  margin-top: 4px;
+  box-shadow: var(--shadow-subtle);
+}
+.r-header { cursor: pointer; }
+.r-label {
+  font-size: 12px;
+  color: var(--fog-grey);
+  text-align: center;
+  margin-bottom: 10px;
+  letter-spacing: -0.1px;
+}
+.r-detail {
+  display: none;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--charcoal);
+}
+.resilience-band.open .r-detail { display: block; }
+.resilience-band .tag {
+  border-color: rgba(99,102,241,0.4);
+  background: rgba(99,102,241,0.08);
+  color: var(--deep-violet);
+}
+.resilience-band .tag.preferred-tag {
+  border-color: rgba(94,106,210,0.5);
+  background: rgba(94,106,210,0.1);
+  color: var(--aether-blue);
+}
+.resilience-band .tag:hover { border-color: var(--deep-violet); color: var(--light-steel); }
+.invariants {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--charcoal);
+}
+.invariant {
+  font-size: 12px;
+  color: var(--storm-cloud);
+  font-style: italic;
+  text-align: center;
+  line-height: 1.5;
+}
+.invariant strong { font-style: normal; font-weight: 600; color: var(--light-steel); }
+
+/* ── Overlay & Popover ────────────────────────────────────────── */
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 100;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  backdrop-filter: blur(2px);
+}
+.overlay.active { display: flex; }
+
+.popover {
+  background: var(--deep-slate);
+  border: 1px solid var(--charcoal);
+  border-radius: 10px;
+  max-width: 560px;
+  width: 100%;
+  max-height: 82vh;
+  overflow-y: auto;
+  padding: 24px;
+  box-shadow: var(--shadow-xl);
+  position: relative;
+}
+.popover::-webkit-scrollbar { width: 4px; }
+.popover::-webkit-scrollbar-track { background: transparent; }
+.popover::-webkit-scrollbar-thumb { background: var(--gunmetal); border-radius: 2px; }
+
+.popover-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: var(--gunmetal);
+  border: 1px solid var(--charcoal);
+  border-radius: var(--radius-badge);
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+  font-size: 11px;
+  color: var(--storm-cloud);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s;
+}
+.popover-close:hover { background: var(--muted-ash); color: var(--porcelain); }
+
+.popover-category {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fog-grey);
+  margin-bottom: 4px;
+}
+.popover h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--porcelain);
+  margin-bottom: 16px;
+  letter-spacing: -0.15px;
+  line-height: 1.3;
+  padding-right: 32px;
+}
+.pop-section { margin-bottom: 16px; }
+.pop-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fog-grey);
+  margin-bottom: 6px;
+}
+.pop-section p {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--storm-cloud);
+}
+.pop-section ul { padding-left: 16px; }
+.pop-section ul li {
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--storm-cloud);
+  margin-bottom: 4px;
+}
+.pop-section ul li::marker { color: var(--fog-grey); }
+
+.oss-pills { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+
+.oss-pill {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: var(--gunmetal);
+  border: 1px solid var(--muted-ash);
+  border-radius: var(--radius-badge);
+  padding: 2px 8px;
+  color: var(--storm-cloud);
+  text-decoration: none;
+  display: inline-block;
+  transition: border-color 0.12s, color 0.12s, transform 0.1s;
+}
+a.oss-pill:hover {
+  border-color: var(--light-steel);
+  color: var(--light-steel);
+  transform: translateY(-1px);
+}
+
+.oss-pill-preferred {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: var(--neon-lime);
+  border: 1px solid var(--neon-lime);
+  border-radius: var(--radius-badge);
+  padding: 2px 8px;
+  color: var(--pitch-black);
+  font-weight: 600;
+  text-decoration: none;
+  display: inline-block;
+  transition: background 0.12s, transform 0.1s;
+}
+.oss-pill-preferred::before { content: '★ '; font-size: 9px; opacity: 0.8; }
+a.oss-pill-preferred:hover { background: #f0fb50; transform: translateY(-1px); }
+
+.pop-oss-section { margin-bottom: 8px; }
+.pop-oss-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fog-grey);
+  margin-bottom: 4px;
+  opacity: 0.7;
+}
+
+/* ── Mobile ───────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+  .detail-grid, .invariant-row { grid-template-columns: 1fr; }
+  .header h1 { font-size: 36px; }
+  .layer-letter { font-size: 22px; width: 28px; }
+  .popover { padding: 16px; }
+  .legend { gap: 10px; }
+}
 </style>
 </head>
 <body>
@@ -250,40 +598,50 @@
     <h2 id="pop-title"></h2>
     <div class="pop-section"><div class="pop-label">What it does</div><p id="pop-what"></p></div>
     <div class="pop-section"><div class="pop-label">Key tradeoffs</div><ul id="pop-tradeoffs"></ul></div>
-    <div class="pop-section"><div class="pop-label">Open source</div><div class="pop-oss-section"><div class="pop-oss-label">Preferred</div><div class="oss-pills" id="pop-preferred"></div></div><div class="pop-oss-section" id="pop-alt-section"><div class="pop-oss-label">Alternatives</div><div class="oss-pills" id="pop-oss"></div></div></div>
+    <div class="pop-section">
+      <div class="pop-label">Open source</div>
+      <div class="pop-oss-section"><div class="pop-oss-label">Preferred</div><div class="oss-pills" id="pop-preferred"></div></div>
+      <div class="pop-oss-section" id="pop-alt-section"><div class="pop-oss-label">Alternatives</div><div class="oss-pills" id="pop-oss"></div></div>
+    </div>
   </div>
 </div>
 
 <div class="page">
-  <div class="doc-title">
+
+  <div class="header">
+    <div class="header-eyebrow">Platform Engineering Reference Model</div>
     <h1>RECODED</h1>
-    <p>A DevEx platform engineering reference model</p>
+    <div class="header-sub">Seven layers. Every capability. One model.</div>
   </div>
+
   <div class="legend">
-    <div class="legend-item"><span class="legend-tag-pref">tag</span> Organisation preferred</div>
-    <div class="legend-item"><span class="legend-tag-std">tag</span> Solution type</div>
-    <div class="legend-item"><span class="legend-pill pref">pill</span> Preferred OSS</div>
-    <div class="legend-item"><span class="legend-pill alt">pill</span> Alternative OSS</div>
+    <div class="legend-item"><span class="lbadge tag-pref">tag</span> Has preferred choice</div>
+    <div class="legend-item"><span class="lbadge tag-std">tag</span> Solution type</div>
+    <div class="legend-item"><span class="lbadge preferred">pill</span> Preferred OSS</div>
+    <div class="legend-item"><span class="lbadge">pill</span> Alternative OSS</div>
   </div>
+
   <div class="search-wrap">
-    <span class="search-icon">&#9906;</span>
-    <input class="search-input" id="search-input" type="text" placeholder="Search solutions, tools, or layers&hellip;" oninput="handleSearch(this.value)">
+    <span class="search-icon">⌕</span>
+    <input class="search-input" id="search-input" type="text"
+      placeholder="Search solutions, tools, layers…"
+      oninput="handleSearch(this.value)">
     <button class="search-clear" id="search-clear" onclick="clearSearch()">&#x2715;</button>
   </div>
   <div class="search-meta" id="search-meta"></div>
 
   <div class="resilience-frame">
-    <span class="resilience-label">R &mdash; Resilience patterns (cross-cutting)</span>
+    <span class="resilience-label">R — Resilience patterns (cross-cutting)</span>
     <span class="resilience-label-bottom">Applied across every layer</span>
     <div class="layers">
 
       <!-- E: Edge -->
-      <div class="layer l-teal" onclick="toggleLayer(event,this)">
+      <div class="layer" onclick="toggleLayer(event,this)">
         <div class="layer-letter">E</div>
         <div class="layer-divider"></div>
         <div class="layer-content">
           <div class="layer-name">Edge &amp; traffic control <span class="open-indicator">&#9660;</span></div>
-          <div class="layer-desc">The front door - only valid, within-policy traffic gets through</div>
+          <div class="layer-desc">The front door — only valid, within-policy traffic gets through</div>
           <div class="tags">
             <span class="tag preferred-tag" onclick="showTag(event,'API gateway','Edge &amp; traffic control')">API gateway</span>
             <span class="tag" onclick="showTag(event,'Web application firewall','Edge &amp; traffic control')">Web application firewall</span>
@@ -309,12 +667,12 @@
       </div>
 
       <!-- C: Compute -->
-      <div class="layer l-blue" onclick="toggleLayer(event,this)">
+      <div class="layer" onclick="toggleLayer(event,this)">
         <div class="layer-letter">C</div>
         <div class="layer-divider"></div>
         <div class="layer-content">
           <div class="layer-name">Compute &amp; service architecture <span class="open-indicator">&#9660;</span></div>
-          <div class="layer-desc">Where code runs - replaceable services, controlled communication</div>
+          <div class="layer-desc">Where code runs — replaceable services, controlled communication</div>
           <div class="tags">
             <span class="tag preferred-tag" onclick="showTag(event,'Container runtime','Compute &amp; service architecture')">Container runtime</span>
             <span class="tag preferred-tag" onclick="showTag(event,'Container orchestrator','Compute &amp; service architecture')">Container orchestrator</span>
@@ -330,23 +688,23 @@
           <div class="detail">
             <div class="detail-grid">
               <div class="detail-cell"><div class="dc-label">Platform view</div><p>Execution environment for services. Services run stateless or state-minimised with controlled communication paths. Services are replaceable and do not rely on local state.</p></div>
-              <div class="detail-cell"><div class="dc-label">Developer view</div><p>The runtime contract a developer writes code against. A predictable, low-friction deployment target. Local-to-production parity is essential - the same mental model at every stage.</p></div>
+              <div class="detail-cell"><div class="dc-label">Developer view</div><p>The runtime contract a developer writes code against. A predictable, low-friction deployment target. Local-to-production parity is essential.</p></div>
             </div>
             <div class="invariant-row">
               <div class="inv-block"><div class="inv-label">Platform invariant</div><p>Services are replaceable and do not rely on local state or topology assumptions.</p></div>
-              <div class="inv-block"><div class="inv-label">Developer invariant</div><p>A developer can deploy, run locally, and debug their service using the same mental model and tooling at every stage.</p></div>
+              <div class="inv-block"><div class="inv-label">Developer invariant</div><p>A developer can deploy, run locally, and debug their service using the same mental model at every stage.</p></div>
             </div>
           </div>
         </div>
       </div>
 
       <!-- O: Observability -->
-      <div class="layer l-amber" onclick="toggleLayer(event,this)">
+      <div class="layer" onclick="toggleLayer(event,this)">
         <div class="layer-letter">O</div>
         <div class="layer-divider"></div>
         <div class="layer-content">
           <div class="layer-name">Observability &amp; diagnostics <span class="open-indicator">&#9660;</span></div>
-          <div class="layer-desc">If you can't see it, you can't fix it - every request leaves a trace</div>
+          <div class="layer-desc">If you can't see it, you can't fix it — every request leaves a trace</div>
           <div class="tags">
             <span class="tag preferred-tag" onclick="showTag(event,'Structured log aggregator','Observability &amp; diagnostics')">Structured log aggregator</span>
             <span class="tag preferred-tag" onclick="showTag(event,'Metrics collection agent','Observability &amp; diagnostics')">Metrics collection agent</span>
@@ -361,7 +719,7 @@
           <div class="detail">
             <div class="detail-grid">
               <div class="detail-cell"><div class="dc-label">Platform view</div><p>Actionable visibility into system behaviour and failure modes. Every request carries traceable context across all service boundaries.</p></div>
-              <div class="detail-cell"><div class="dc-label">Developer view</div><p>The primary tool a developer has for understanding whether their service is working and why it failed. Production must be legible without understanding the telemetry pipeline.</p></div>
+              <div class="detail-cell"><div class="dc-label">Developer view</div><p>The primary tool for understanding whether a service is working and why it failed. Production must be legible without understanding the telemetry pipeline.</p></div>
             </div>
             <div class="invariant-row">
               <div class="inv-block"><div class="inv-label">Platform invariant</div><p>Every request carries traceable context across all service boundaries.</p></div>
@@ -372,12 +730,12 @@
       </div>
 
       <!-- D: Data -->
-      <div class="layer l-green" onclick="toggleLayer(event,this)">
+      <div class="layer" onclick="toggleLayer(event,this)">
         <div class="layer-letter">D</div>
         <div class="layer-divider"></div>
         <div class="layer-content">
           <div class="layer-name">Data &amp; storage <span class="open-indicator">&#9660;</span></div>
-          <div class="layer-desc">State with a contract - know your consistency guarantees before you commit</div>
+          <div class="layer-desc">State with a contract — know your consistency guarantees before you commit</div>
           <div class="tags">
             <span class="tag" onclick="showTag(event,'Relational database','Data &amp; storage')">Relational database</span>
             <span class="tag" onclick="showTag(event,'Document store','Data &amp; storage')">Document store</span>
@@ -393,7 +751,7 @@
           <div class="detail">
             <div class="detail-grid">
               <div class="detail-cell"><div class="dc-label">Platform view</div><p>Persistent and cached state management within defined consistency and durability bounds. Every dataset has explicit and documented consistency and failure behaviour under partition.</p></div>
-              <div class="detail-cell"><div class="dc-label">Developer view</div><p>The place where application behaviour is shaped by constraints a developer may not have chosen themselves. Developers must know what guarantees they are getting before committing to a storage choice.</p></div>
+              <div class="detail-cell"><div class="dc-label">Developer view</div><p>Developers must know exactly what guarantees they are getting and giving up before committing to a storage choice.</p></div>
             </div>
             <div class="invariant-row">
               <div class="inv-block"><div class="inv-label">Platform invariant</div><p>Every dataset has explicit and documented consistency and failure behaviour under partition.</p></div>
@@ -404,12 +762,12 @@
       </div>
 
       <!-- E: Eventing -->
-      <div class="layer l-coral" onclick="toggleLayer(event,this)">
+      <div class="layer" onclick="toggleLayer(event,this)">
         <div class="layer-letter">E</div>
         <div class="layer-divider"></div>
         <div class="layer-content">
           <div class="layer-name">Eventing &amp; async processing <span class="open-indicator">&#9660;</span></div>
-          <div class="layer-desc">Decouple to survive - consumers must handle duplicates and delays gracefully</div>
+          <div class="layer-desc">Decouple to survive — consumers must handle duplicates and delays gracefully</div>
           <div class="tags">
             <span class="tag" onclick="showTag(event,'Message queue','Eventing &amp; async processing')">Message queue</span>
             <span class="tag" onclick="showTag(event,'Service bus','Eventing &amp; async processing')">Service bus</span>
@@ -423,8 +781,8 @@
           </div>
           <div class="detail">
             <div class="detail-grid">
-              <div class="detail-cell"><div class="dc-label">Platform view</div><p>Decoupled communication through asynchronous messaging and streams. Enables resilient workflows without synchronous dependency chains. All consumers must tolerate duplicate and delayed messages safely.</p></div>
-              <div class="detail-cell"><div class="dc-label">Developer view</div><p>A coordination mechanism that moves complexity out of individual services but introduces its own operational surface. Async failure modes must be legible and testable without deep expertise in the messaging platform.</p></div>
+              <div class="detail-cell"><div class="dc-label">Platform view</div><p>Decoupled communication through asynchronous messaging and streams. Enables resilient workflows without synchronous dependency chains.</p></div>
+              <div class="detail-cell"><div class="dc-label">Developer view</div><p>Async failure modes must be legible and testable without deep expertise in the messaging platform.</p></div>
             </div>
             <div class="invariant-row">
               <div class="inv-block"><div class="inv-label">Platform invariant</div><p>All consumers must tolerate duplicate and delayed messages safely.</p></div>
@@ -435,12 +793,12 @@
       </div>
 
       <!-- D: Deployment -->
-      <div class="layer l-gray" onclick="toggleLayer(event,this)">
+      <div class="layer" onclick="toggleLayer(event,this)">
         <div class="layer-letter">D</div>
         <div class="layer-divider"></div>
         <div class="layer-content">
-          <div class="layer-name">Deployment - control plane &amp; configuration <span class="open-indicator">&#9660;</span></div>
-          <div class="layer-desc">Intent becomes reality - configuration is code, and drift is a bug</div>
+          <div class="layer-name">Deployment — control plane &amp; configuration <span class="open-indicator">&#9660;</span></div>
+          <div class="layer-desc">Intent becomes reality — configuration is code, and drift is a bug</div>
           <div class="tags">
             <span class="tag preferred-tag" onclick="showTag(event,'GitOps controller','Deployment')">GitOps controller</span>
             <span class="tag preferred-tag" onclick="showTag(event,'Infrastructure-as-code tool','Deployment')">Infrastructure-as-code tool</span>
@@ -455,7 +813,7 @@
           <div class="detail">
             <div class="detail-grid">
               <div class="detail-cell"><div class="dc-label">Platform view</div><p>System-wide configuration, orchestration, and state convergence. Desired system state is consistently applied and auditable. Drift is a failure condition, not an accepted state.</p></div>
-              <div class="detail-cell"><div class="dc-label">Developer view</div><p>The mechanism through which intent becomes running system behaviour - and the source of unexpected surprises when it drifts. Configuration changes must be discoverable and safe without platform team gatekeeping.</p></div>
+              <div class="detail-cell"><div class="dc-label">Developer view</div><p>Configuration changes must be discoverable and safe without platform team gatekeeping.</p></div>
             </div>
             <div class="invariant-row">
               <div class="inv-block"><div class="inv-label">Platform invariant</div><p>System state converges deterministically toward declared configuration with full auditability.</p></div>
@@ -470,7 +828,7 @@
     <!-- Resilience band -->
     <div class="resilience-band" id="res-band">
       <div class="r-header" onclick="toggleRes()">
-        <div class="r-label">Resilience - applied across every layer above <span style="font-family:JetBrains Mono,monospace;font-size:0.7rem;opacity:0.4;">&#9660;</span></div>
+        <div class="r-label">R — Resilience patterns &nbsp;·&nbsp; applied across every layer above &nbsp;<span style="font-size:10px;opacity:0.4;">&#9660;</span></div>
       </div>
       <div class="tags">
         <span class="tag" onclick="showTag(event,'Circuit breaker library','Resilience')">Circuit breaker library</span>
@@ -484,18 +842,20 @@
         <span class="tag" onclick="showTag(event,'Backoff strategy','Resilience')">Backoff strategy</span>
       </div>
       <div class="r-detail">
-        <div class="detail-grid" style="margin-top:1rem;">
-          <div class="detail-cell"><div class="dc-label" style="color:#534AB7;">Platform view</div><p style="color:#3C3489;">System behaviour under partial or total failure conditions. Prevent cascading failures and preserve system usability under stress. No single dependency failure is allowed to exhaust system-wide resources.</p></div>
-          <div class="detail-cell"><div class="dc-label" style="color:#534AB7;">Developer view</div><p style="color:#3C3489;">The difference between a developer's service degrading gracefully and taking down everything that depends on it. Platform-provided resilience defaults must be safe out of the box - opt out, never opt in.</p></div>
+        <div class="detail-grid" style="margin-top:12px;">
+          <div class="detail-cell"><div class="dc-label">Platform view</div><p>Prevent cascading failures and preserve system usability under stress. No single dependency failure is allowed to exhaust system-wide resources.</p></div>
+          <div class="detail-cell"><div class="dc-label">Developer view</div><p>Platform-provided resilience defaults must be safe out of the box — opt out, never opt in.</p></div>
         </div>
-        <div class="invariants" style="margin-top:0.85rem;padding-top:0.85rem;border-top:1px solid #AFA9EC;">
+        <div class="invariants">
           <div class="invariant"><strong>Platform invariant:</strong> no single dependency failure may exhaust system-wide resources</div>
-          <div class="invariant"><strong>Developer invariant:</strong> resilience defaults are safe out of the box - opt out, never opt in</div>
+          <div class="invariant"><strong>Developer invariant:</strong> resilience defaults are safe out of the box — opt out, never opt in</div>
         </div>
       </div>
     </div>
+
   </div>
 </div>
+
 <script>
 const S = {
   "API gateway": { preferred:[{"name":"Cilium + Gateway API","url":"https://cilium.io/use-cases/gateway-api/"}], cat:"Edge & traffic control", what:"An API gateway is the single entry point for all client requests to backend services. It handles routing, enforces authentication and authorisation policies, applies rate limits, transforms payloads where needed, and provides a unified API surface to external consumers. It decouples the external API contract from internal service topology, meaning you can reorganise services internally without breaking clients.", tradeoffs:["Centralising all traffic through one gateway creates a potential single point of failure - it must be highly available and scaled accordingly.","Gateways can become a dumping ground for business logic. Keep them focused on cross-cutting concerns like auth and routing, not service-specific transformation.","Adding a gateway hop increases latency marginally. For latency-sensitive paths this needs to be measured.","A monolithic gateway shared by all teams can become a deployment bottleneck - consider a federated or per-team model at scale."], oss:[{"name":"Kong","url":"https://konghq.com/community"},{"name":"Traefik","url":"https://traefik.io"},{"name":"Envoy","url":"https://www.envoyproxy.io"},{"name":"APISIX","url":"https://apisix.apache.org"},{"name":"Tyk","url":"https://tyk.io"}] },
@@ -667,7 +1027,6 @@ function clearSearch() {
 function closePopover(e) { if (e.target === document.getElementById('overlay')) closeOverlay(); }
 function toggleLayer(event, el) { if (event.target.classList.contains('tag')) return; el.classList.toggle('open'); }
 function toggleRes() { document.getElementById('res-band').classList.toggle('open'); }
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeOverlay(); });
-</script>
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeOverlay(); });</script>
 </body>
 </html>
